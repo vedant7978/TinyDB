@@ -1,3 +1,8 @@
+import Query.DataOperations.InsertIntoTable;
+import Query.Database.CreateDatabase;
+import Query.Database.UseDatabase;
+import Query.Table.CreateTable;
+import Query.Table.DropTable;
 import Security.login.UserLoginImpl;
 import Security.register.UserRegistrationImpl;
 
@@ -60,8 +65,31 @@ public class Main {
     }
 
     private static void writeQueries() {
-        System.out.println("Writing queries...");
-        // Implement the logic for writing queries here
+        Scanner scanner = new Scanner(System.in);
+        System.out.println("Enter your SQL query: ");
+        StringBuilder queryBuilder = new StringBuilder();
+        String line = scanner.nextLine();
+        queryBuilder.append(line).append(" ");
+        String query = queryBuilder.toString().trim();
+
+        if (!query.endsWith(";")) {
+            System.out.println("Invalid query format. Query must end with a semicolon (;).");
+            return;
+        }
+
+        query = query.substring(0, query.length() - 1).trim(); // Remove the semicolon for processing
+
+        if (query.toLowerCase().startsWith("create database")) {
+            CreateDatabase.create(query);
+        } else if (query.toLowerCase().startsWith("use")) {
+            UseDatabase.use(query);
+        } else if (query.toLowerCase().startsWith("create table")) {
+            CreateTable.create(query);
+        }else if (query.toLowerCase().startsWith("insert into")) {
+            InsertIntoTable.insert(query);
+        } else {
+            System.out.println("Invalid query. Please enter a valid SQL query.");
+        }
     }
 
     private static void exportDataAndStructure() {
