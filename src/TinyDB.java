@@ -11,31 +11,34 @@ import static Utills.QueryProcessor.writeQueries;
 
 public class TinyDB {
     public static void main(String[] args) {
-//        displayUserOptions();
-
         UserLoginImpl userLogin = new UserLoginImpl();
         UserRegistrationImpl userRegistration = new UserRegistrationImpl();
         Scanner scanner = new Scanner(System.in);
-        try {
-            System.out.println("Choose an action: ");
-            System.out.println("1. Login");
-            System.out.println("2. Register");
-            System.out.print("Enter your choice: ");
-            int choice = scanner.nextInt();
-            switch (choice) {
-                case 1:
-                    if (userLogin.userLogin()) {
-                        displayUserOptions();
-                    }
-                    break;
-                case 2:
-                    userRegistration.userRegistration();
-                    break;
-                default:
-                    System.out.println(ANSI_RED + "Invalid choice. Please enter 1 or 2." + ANSI_RESET);
+
+        while (true) {
+            try {
+                System.out.println("Choose an action: ");
+                System.out.println("1. Login");
+                System.out.println("2. Register");
+                System.out.print("Enter your choice: ");
+                int choice = scanner.nextInt();
+
+                switch (choice) {
+                    case 1:
+                        if (userLogin.userLogin()) {
+                            displayUserOptions();
+                            return;
+                        }
+                        break;
+                    case 2:
+                        userRegistration.userRegistration();
+                        break;
+                    default:
+                        System.out.println(ANSI_RED + "Invalid choice. Please enter 1 or 2." + ANSI_RESET);
+                }
+            } catch (NoSuchAlgorithmException e) {
+                e.printStackTrace();
             }
-        } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
         }
     }
 
