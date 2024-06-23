@@ -3,23 +3,21 @@ package Security.register;
 import Security.login.UserLoginImpl;
 import Utills.Hashing;
 
-
 import java.io.FileWriter;
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.util.Scanner;
 
-public class UserRegistrationImpl implements UserRegister {
+import static Utills.ColorConstraint.*;
 
-    public static final String ANSI_GREEN = "\u001B[32m";
-    public static final String ANSI_RESET = "\u001B[0m";
+public class UserRegistrationImpl implements UserRegister {
     private static String userID;
     private String password;
     private static String securityQuestion1;
     private static String securityAnswer1;
     private static String securityAnswer2;
-    private static UserLoginImpl userLogin = new UserLoginImpl();
-    private static Hashing hashing = new Hashing();
+    private static final UserLoginImpl userLogin = new UserLoginImpl();
+    private static final Hashing hashing = new Hashing();
 
     public void setUserID(String userID) {
         UserRegistrationImpl.userID = userID;
@@ -61,8 +59,8 @@ public class UserRegistrationImpl implements UserRegister {
         while (!isUserIDValid) {
             System.out.println("Enter your userID: ");
             userID = scanner.nextLine();
-            if (userLogin.isUserIDExists(userID)){
-                System.out.println("userID is already exists. Please choose another userID.");
+            if (userLogin.isUserIDExists(hashUserID(userID))) {
+                System.out.println(ANSI_RED + "UserID already exists. Please choose another userID." + ANSI_RESET);
             } else {
                 isUserIDValid = true;
             }
@@ -91,7 +89,7 @@ public class UserRegistrationImpl implements UserRegister {
 
         FileWriter fileWriter;
         try {
-            fileWriter = new FileWriter("csci_5408_s24_group06/src/User_Profile.txt", true);
+            fileWriter = new FileWriter("./userdata/User_Profile.txt", true);
 
             fileWriter.write(String.format("%s-%s-%s-%s-%s-%s;\n", hashUserID(userID), hashPassword(password), securityQuestion1, securityAnswer1, securityQuestion2, securityAnswer2));
             fileWriter.close();

@@ -2,28 +2,26 @@ package Security.login;
 
 import Utills.Hashing;
 
-
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.security.NoSuchAlgorithmException;
 import java.util.Random;
 import java.util.Scanner;
 
+import static Utills.ColorConstraint.ANSI_RED;
+import static Utills.ColorConstraint.ANSI_RESET;
+
 public class UserLoginImpl implements UserLogin {
-
-    private static final String ANSI_RED = "\u001B[31m";
-    private static final String ANSI_RESET = "\u001B[0m";
-    private static Hashing hashing = new Hashing();
-
+    private static final Hashing hashing = new Hashing();
 
     @Override
     public boolean userLogin() throws NoSuchAlgorithmException {
         Scanner scanner = new Scanner(System.in);
         boolean isUserIDValid = false;
-        String userID = "";
+        String userID;
 
         while (!isUserIDValid) {
-            System.out.println("Enter your userID");
+            System.out.println("Enter your userID:");
             userID = scanner.nextLine();
             String hashedUserID = hashing.hashData(userID);
             if (isUserIDExists(hashedUserID)) {
@@ -42,16 +40,16 @@ public class UserLoginImpl implements UserLogin {
             if (!isAuthenticated) {
                 System.out.println(ANSI_RED + "Incorrect Password" + ANSI_RESET);
             } else {
-                System.out.println("Logged In");
-                System.out.println("Hello " + userID);
+                System.out.println("Successfully Logged In");
                 return true;
             }
         }
         return false;
     }
 
+    @Override
     public boolean isUserIDExists(String hashedUserID) {
-        File userCredentials = new File("csci_5408_s24_group06/src/User_Profile.txt");
+        File userCredentials = new File("./userdata/User_Profile.txt");
         try {
             Scanner fileReader = new Scanner(userCredentials);
             while (fileReader.hasNextLine()) {
@@ -71,9 +69,10 @@ public class UserLoginImpl implements UserLogin {
         }
     }
 
-    private boolean authenticateUser(String hashedPassword) throws NoSuchAlgorithmException {
+    @Override
+    public boolean authenticateUser(String hashedPassword) {
         Scanner scanner = new Scanner(System.in);
-        File userCredentials = new File("csci_5408_s24_group06/src/User_Profile.txt");
+        File userCredentials = new File("./userdata/User_Profile.txt");
         try {
             Scanner fileReader = new Scanner(userCredentials);
             while (fileReader.hasNextLine()) {

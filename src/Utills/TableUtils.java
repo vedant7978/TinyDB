@@ -8,11 +8,14 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.util.List;
 
+import static Utills.ColorConstraint.ANSI_RED;
+import static Utills.ColorConstraint.ANSI_RESET;
+
 public class TableUtils {
 
     public static boolean isDatabaseSelected() {
         if (!UseDatabase.isDatabaseSelected()) {
-            System.out.println("No database selected. Use the USE DATABASE command first.");
+            System.out.println(ANSI_RED + "No database selected. Use the USE DATABASE command first." + ANSI_RESET);
             return false;
         }
         return true;
@@ -22,7 +25,7 @@ public class TableUtils {
         String tableFilePath = "./databases/" + UseDatabase.getCurrentDatabase() + "/" + tableName + ".txt";
         File tableFile = new File(tableFilePath);
         if (!tableFile.exists()) {
-            System.out.println("Table file " + tableFile.getAbsolutePath() + " does not exist.");
+            System.out.println(ANSI_RED+"Table file " + tableFile.getAbsolutePath() + " does not exist."+ANSI_RESET);
             return null;
         }
         return tableFile;
@@ -31,7 +34,7 @@ public class TableUtils {
     public static List<String> readTableFile(File tableFile) throws IOException {
         List<String> fileLines = Files.readAllLines(tableFile.toPath());
         if (fileLines.isEmpty()) {
-            System.out.println("Table " + tableFile.getName() + " is empty.");
+            System.out.println(ANSI_RED+"Table " + tableFile.getName() + " is empty."+ANSI_RESET);
             return null;
         }
         return fileLines;
@@ -49,7 +52,7 @@ public class TableUtils {
     public static boolean removeRecord(List<String> fileLines, int columnIndex, String value, File tableFile) throws IOException {
         boolean recordFound = false;
         try (FileWriter writer = new FileWriter(tableFile)) {
-            writer.write(fileLines.get(0) + System.lineSeparator());
+            writer.write(fileLines.getFirst() + System.lineSeparator());
             for (String line : fileLines.subList(1, fileLines.size())) {
                 String[] values = line.split("~~");
                 if (!values[columnIndex].equals(value)) {
