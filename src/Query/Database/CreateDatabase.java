@@ -3,6 +3,7 @@ package Query.Database;
 import java.io.File;
 
 import static Query.Database.DatabaseQueryValidator.validateCreateDatabaseQuery;
+import static Utills.ColorConstraint.*;
 
 public class CreateDatabase {
     public static void create(String query) {
@@ -13,16 +14,16 @@ public class CreateDatabase {
             File databaseDirectory = new File("./databases/" + databaseName);
 
             if (databaseDirectory.exists() && databaseDirectory.isDirectory()) {
-                System.out.println("Database " + databaseName + " already exists.");
+                System.out.println(ANSI_RED + "Database " + databaseName + " already exists." + ANSI_RESET);
             } else {
                 if (databaseDirectory.mkdirs()) {
-                    System.out.println("Database " + databaseName + " created successfully.");
+                    System.out.println(ANSI_GREEN + "Database " + databaseName + " created successfully." + ANSI_RESET);
                 } else {
-                    System.out.println("Failed to create database " + databaseName + ".");
+                    System.out.println(ANSI_RED + "Failed to create database " + databaseName + "." + ANSI_RESET);
                 }
             }
         } else {
-            System.out.println("Invalid CREATE DATABASE query.");
+            System.out.println(ANSI_RED + "Invalid CREATE DATABASE query." + ANSI_RESET);
         }
     }
 }

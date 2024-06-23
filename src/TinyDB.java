@@ -1,19 +1,18 @@
-import Query.DataOperations.DeleteFromTable;
-import Query.DataOperations.InsertIntoTable;
-import Query.DataOperations.SelectFromTable;
-import Query.DataOperations.UpdateTable;
-import Query.Database.CreateDatabase;
-import Query.Database.UseDatabase;
-import Query.Table.CreateTable;
-import Query.Table.DropTable;
 import Security.login.UserLoginImpl;
 import Security.register.UserRegistrationImpl;
 
 import java.security.NoSuchAlgorithmException;
+import java.util.InputMismatchException;
 import java.util.Scanner;
 
-public class Main {
+import static Utills.ColorConstraint.ANSI_RED;
+import static Utills.ColorConstraint.ANSI_RESET;
+import static Utills.QueryProcessor.writeQueries;
+
+public class TinyDB {
     public static void main(String[] args) {
+//        displayUserOptions();
+
         UserLoginImpl userLogin = new UserLoginImpl();
         UserRegistrationImpl userRegistration = new UserRegistrationImpl();
         Scanner scanner = new Scanner(System.in);
@@ -21,6 +20,7 @@ public class Main {
             System.out.println("Choose an action: ");
             System.out.println("1. Login");
             System.out.println("2. Register");
+            System.out.print("Enter your choice: ");
             int choice = scanner.nextInt();
             switch (choice) {
                 case 1:
@@ -32,7 +32,7 @@ public class Main {
                     userRegistration.userRegistration();
                     break;
                 default:
-                    System.out.println("Invalid choice. Please enter 1 or 2.");
+                    System.out.println(ANSI_RED + "Invalid choice. Please enter 1 or 2." + ANSI_RESET);
             }
         } catch (NoSuchAlgorithmException e) {
             e.printStackTrace();
@@ -47,7 +47,21 @@ public class Main {
             System.out.println("2. Export Data and Structure");
             System.out.println("3. ERD");
             System.out.println("4. Exit");
-            int choice = scanner.nextInt();
+
+            int choice = 0;
+            boolean validInput = false;
+
+            while (!validInput) {
+                try {
+                    System.out.print("Enter your choice: ");
+                    choice = scanner.nextInt();
+                    validInput = true;
+                } catch (InputMismatchException e) {
+                    System.out.println(ANSI_RED + "Invalid input. Please enter a number between 1 and 4." + ANSI_RESET);
+                    scanner.next();
+                    displayUserOptions();
+                }
+            }
             switch (choice) {
                 case 1:
                     writeQueries();
@@ -62,47 +76,11 @@ public class Main {
                     System.out.println("Exiting...");
                     return;
                 default:
-                    System.out.println("Invalid choice. Please enter 1, 2, 3, or 4.");
+                    System.out.println(ANSI_RED + "Invalid choice. Please enter 1, 2, 3, or 4." + ANSI_RESET);
             }
         }
     }
 
-    private static void writeQueries() {
-        Scanner scanner = new Scanner(System.in);
-        System.out.println("Enter your SQL query: ");
-        StringBuilder queryBuilder = new StringBuilder();
-        String line = scanner.nextLine();
-        queryBuilder.append(line).append(" ");
-        String query = queryBuilder.toString().trim();
-
-        if (!query.endsWith(";")) {
-            System.out.println("Invalid query format. Query must end with a semicolon (;).");
-            return;
-        }
-
-        query = query.substring(0, query.length() - 1).trim(); // Remove the semicolon for processing
-
-
-        if (query.toLowerCase().startsWith("create database")) {
-            CreateDatabase.create(query);
-        } else if (query.toLowerCase().startsWith("use")) {
-            UseDatabase.use(query);
-        } else if (query.toLowerCase().startsWith("create table")) {
-            CreateTable.create(query);
-        } else if (query.toLowerCase().startsWith("drop table")) {
-            DropTable.drop(query);
-        } else if (query.toLowerCase().startsWith("delete from")) {
-            DeleteFromTable.delete(query);
-        } else if (query.toLowerCase().startsWith("insert into")) {
-            InsertIntoTable.insert(query);
-        } else if (query.toLowerCase().startsWith("select")) {
-            SelectFromTable.select(query);
-        } else if (query.toLowerCase().startsWith("update")) {
-            UpdateTable.update(query);
-        } else {
-            System.out.println("Invalid query. Please enter a valid SQL query.");
-        }
-    }
 
     private static void exportDataAndStructure() {
         System.out.println("Exporting data and structure...");

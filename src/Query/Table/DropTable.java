@@ -1,16 +1,15 @@
 package Query.Table;
 
-import Query.Database.UseDatabase;
+import Utills.TableUtils;
 
 import java.io.File;
-
 import static Query.Database.UseDatabase.getCurrentDatabase;
 import static Query.Table.DatabaseTableValidator.validateDropTable;
+import static Utills.ColorConstraint.*;
 
 public class DropTable {
     public static void drop(String query) {
-        if (!UseDatabase.isDatabaseSelected()) {
-            System.out.println("No database selected. Use the USE DATABASE command first.");
+        if (!TableUtils.isDatabaseSelected()) {
             return;
         }
         String[] parts = query.split(" ", 3);
@@ -18,16 +17,16 @@ public class DropTable {
             String tableName = parts[2];
             File tableFile = new File("./databases/" + getCurrentDatabase() + "/" + tableName + ".txt");
             if (!tableFile.exists()) {
-                System.out.println("Table " + tableName + " does not exist.");
+                System.out.println(ANSI_RED + "Table " + tableName + " does not exist." + ANSI_RESET);
                 return;
             }
             if (tableFile.delete()) {
-                System.out.println("Table " + tableName + " dropped successfully.");
+                System.out.println(ANSI_GREEN + "Table " + tableName + " dropped successfully." + ANSI_RESET);
             } else {
-                System.out.println("Failed to drop table " + tableName + ".");
+                System.out.println(ANSI_RED + "Failed to drop table " + tableName + "." + ANSI_RESET);
             }
         } else {
-            System.out.println("Invalid DROP TABLE query.");
+            System.out.println(ANSI_RED+"Invalid DROP TABLE query." + ANSI_RESET);
         }
     }
 }
