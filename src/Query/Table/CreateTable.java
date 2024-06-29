@@ -60,7 +60,7 @@ public class CreateTable {
                 }
             }
         } else {
-            System.out.println(ANSI_RED + "Invalid query structure." + ANSI_RESET);
+            System.out.println(ANSI_RED + "Invalid query. Primary key not specified in the CREATE TABLE statement." + ANSI_RESET);
         }
 
     }
