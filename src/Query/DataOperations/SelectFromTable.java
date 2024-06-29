@@ -27,12 +27,14 @@ public class SelectFromTable {
 
             File tableFile = TableUtils.getTableFile(tableName);
             if (tableFile == null) {
+                System.out.println(ANSI_RED + "Table " + tableName + " does not exist." + ANSI_RESET);
                 return;
             }
 
             try {
                 List<String> fileLines = TableUtils.readTableFile(tableFile);
-                if (fileLines == null) {
+                if (fileLines == null || fileLines.isEmpty()) {
+                    System.out.println(ANSI_RED + "Table " + tableName + " is empty or could not be read." + ANSI_RESET);
                     return;
                 }
 
@@ -43,11 +45,6 @@ public class SelectFromTable {
                     return;
                 }
 
-                for (int index : columnIndices) {
-                    System.out.print(headers[index].trim().split(" ")[0] + "\t");
-                }
-                System.out.println();
-
                 int conditionColumnIndex = -1;
                 if (conditionColumn != null) {
                     conditionColumnIndex = TableUtils.getColumnIndex(headers, conditionColumn);
@@ -57,21 +54,34 @@ public class SelectFromTable {
                     }
                 }
 
+                boolean recordFound = false;
                 for (String line : fileLines.subList(1, fileLines.size())) {
                     String[] rowValues = line.split("~~", -1);
                     if (conditionColumnIndex == -1 || rowValues[conditionColumnIndex].trim().equalsIgnoreCase(conditionValue)) {
+                        if (!recordFound) {
+                            // Print headers the first time a matching record is found
+                            for (int index : columnIndices) {
+                                System.out.print(headers[index].trim().split(" ")[0] + "\t");
+                            }
+                            System.out.println();
+                        }
+                        recordFound = true;
                         for (int index : columnIndices) {
                             System.out.print(rowValues[index].trim().replace("'", "") + "\t");
                         }
                         System.out.println();
                     }
                 }
+
+                if (!recordFound) {
+                    System.out.println(ANSI_RED + "No matching records found for the condition " + conditionColumn + "='" + conditionValue + "'." + ANSI_RESET);
+                }
             } catch (IOException e) {
                 System.out.println(ANSI_RED + "An error occurred while reading the table." + ANSI_RESET);
                 e.printStackTrace();
             }
         } else {
-            System.out.println("Invalid SELECT query format.");
+            System.out.println(ANSI_RED + "Invalid SELECT query format." + ANSI_RESET);
         }
     }
 

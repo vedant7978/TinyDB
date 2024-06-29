@@ -31,6 +31,7 @@ public class QueryProcessor {
         }
 
         query = query.substring(0, query.length() - 1).trim();
+        query = query.replaceAll("\\s+", " ");
 
         if (query.toLowerCase().startsWith("create database")) {
             CreateDatabase.create(query);

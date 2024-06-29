@@ -8,8 +8,7 @@ import java.security.NoSuchAlgorithmException;
 import java.util.Random;
 import java.util.Scanner;
 
-import static Utills.ColorConstraint.ANSI_RED;
-import static Utills.ColorConstraint.ANSI_RESET;
+import static Utills.ColorConstraint.*;
 
 public class UserLoginImpl implements UserLogin {
     private static final Hashing hashing = new Hashing();
@@ -40,7 +39,7 @@ public class UserLoginImpl implements UserLogin {
             if (!isAuthenticated) {
                 System.out.println(ANSI_RED + "Incorrect Password" + ANSI_RESET);
             } else {
-                System.out.println("Successfully Logged In");
+                System.out.println(ANSI_GREEN+"Successfully Logged In"+ANSI_RESET);
                 return true;
             }
         }

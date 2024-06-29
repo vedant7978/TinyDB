@@ -21,6 +21,13 @@ public class TinyDB {
                 System.out.println("1. Login");
                 System.out.println("2. Register");
                 System.out.print("Enter your choice: ");
+
+                while (!scanner.hasNextInt()) {
+                    System.out.println(ANSI_RED + "Invalid input. Please enter a number." + ANSI_RESET);
+                    scanner.nextLine();
+                    System.out.print("Enter your choice: ");
+                }
+
                 int choice = scanner.nextInt();
 
                 switch (choice) {
@@ -38,6 +45,9 @@ public class TinyDB {
                 }
             } catch (NoSuchAlgorithmException e) {
                 e.printStackTrace();
+            } catch (InputMismatchException e) {
+                System.out.println(ANSI_RED + "Invalid input. Please enter a number." + ANSI_RESET);
+                scanner.nextLine();
             }
         }
     }
@@ -83,7 +93,6 @@ public class TinyDB {
             }
         }
     }
-
 
     private static void exportDataAndStructure() {
         System.out.println("Exporting data and structure...");

@@ -77,4 +77,16 @@ public class TableUtils {
         }
         return updated;
     }
+    public static boolean writeTableFile(File tableFile, List<String> fileLines) {
+        try (FileWriter writer = new FileWriter(tableFile)) {
+            for (String line : fileLines) {
+                writer.write(line + System.lineSeparator());
+            }
+            return true;
+        } catch (IOException e) {
+            System.out.println(ANSI_RED + "Failed to write to table file " + tableFile.getName() + "." + ANSI_RESET);
+            e.printStackTrace();
+            return false;
+        }
+    }
 }
