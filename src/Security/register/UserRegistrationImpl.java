@@ -14,6 +14,7 @@ public class UserRegistrationImpl implements UserRegister {
     private static String userID;
     private String password;
     private static String securityQuestion1;
+    private static String securityQuestion2;
     private static String securityAnswer1;
     private static String securityAnswer2;
     private static final UserLoginImpl userLogin = new UserLoginImpl();
@@ -43,7 +44,8 @@ public class UserRegistrationImpl implements UserRegister {
         UserRegistrationImpl.securityAnswer1 = securityAnswer1;
     }
 
-    public void setSecurityQuestion2() {
+    public void setSecurityQuestion2(String securityQuestion2) {
+        UserRegistrationImpl.securityQuestion2 = securityQuestion2;
     }
 
     public void setSecurityAnswer2(String securityAnswer2) {
@@ -81,7 +83,7 @@ public class UserRegistrationImpl implements UserRegister {
 
         System.out.println("Enter the second security question: ");
         String securityQuestion2 = scanner.nextLine();
-        setSecurityQuestion2();
+        setSecurityQuestion2(securityQuestion2);
 
         System.out.println("Enter the answer to that second security question: ");
         String securityAnswer2 = scanner.nextLine();
