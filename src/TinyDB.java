@@ -5,6 +5,8 @@ import java.security.NoSuchAlgorithmException;
 import java.util.InputMismatchException;
 import java.util.Scanner;
 
+import static ExportData.ExportData.databaseExists;
+import static ExportData.ExportData.exportDatabase;
 import static Utills.ColorConstraint.ANSI_RED;
 import static Utills.ColorConstraint.ANSI_RESET;
 import static Utills.QueryProcessor.writeQueries;
@@ -95,12 +97,23 @@ public class TinyDB {
     }
 
     private static void exportDataAndStructure() {
-        System.out.println("Exporting data and structure...");
-        // Implement the logic for exporting data and structure here
+        Scanner scanner = new Scanner(System.in);
+        String databaseName;
+
+        while (true) {
+            System.out.print("Enter the database name to export: ");
+            databaseName = scanner.nextLine();
+            if (databaseExists(databaseName)) {
+                System.out.println("Exporting data and structure...");
+                exportDatabase(databaseName);
+                break;
+            } else {
+                System.out.println(ANSI_RED + "Database " + databaseName + " does not exist. Please try again." + ANSI_RESET);
+            }
+        }
     }
 
     private static void erd() {
         System.out.println("Generating ERD...");
-        // Implement the logic for generating ERD here
     }
 }
