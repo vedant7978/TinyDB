@@ -1,4 +1,4 @@
-package Utills;
+package Utils;
 
 import Query.Database.UseDatabase;
 
@@ -8,8 +8,8 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.util.List;
 
-import static Utills.ColorConstraint.ANSI_RED;
-import static Utills.ColorConstraint.ANSI_RESET;
+import static Utils.ColorConstraint.ANSI_RED;
+import static Utils.ColorConstraint.ANSI_RESET;
 
 public class TableUtils {
 

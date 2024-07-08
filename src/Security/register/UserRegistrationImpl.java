@@ -1,14 +1,14 @@
 package Security.register;
 
 import Security.login.UserLoginImpl;
-import Utills.Hashing;
+import Utils.Hashing;
 
 import java.io.FileWriter;
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.util.Scanner;
 
-import static Utills.ColorConstraint.*;
+import static Utils.ColorConstraint.*;
 
 public class UserRegistrationImpl implements UserRegister {
     private static String userID;

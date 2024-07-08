@@ -2,8 +2,8 @@ package Query.DataOperations;
 
 import Query.TransactionManagement.TransactionManager;
 import Query.TransactionManagement.TransactionManagerImpl;
-import Utills.RegexPatterns;
-import Utills.TableUtils;
+import Utils.RegexPatterns;
+import Utils.TableUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -11,8 +11,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 
-import static Utills.ColorConstraint.ANSI_RED;
-import static Utills.ColorConstraint.ANSI_RESET;
+import static Utils.ColorConstraint.ANSI_RED;
+import static Utils.ColorConstraint.ANSI_RESET;
 
 public class SelectFromTable {
 

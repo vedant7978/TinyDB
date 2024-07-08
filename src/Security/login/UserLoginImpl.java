@@ -1,6 +1,6 @@
 package Security.login;
 
-import Utills.Hashing;
+import Utils.Hashing;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -8,7 +8,7 @@ import java.security.NoSuchAlgorithmException;
 import java.util.Random;
 import java.util.Scanner;
 
-import static Utills.ColorConstraint.*;
+import static Utils.ColorConstraint.*;
 
 public class UserLoginImpl implements UserLogin {
     private static final Hashing hashing = new Hashing();

@@ -1,8 +1,8 @@
 package Query.DataOperations;
 
 import Query.TransactionManagement.TransactionManagerImpl;
-import Utills.RegexPatterns;
-import Utills.TableUtils;
+import Utils.RegexPatterns;
+import Utils.TableUtils;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -10,7 +10,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.regex.Matcher;
 
-import static Utills.ColorConstraint.*;
+import static Utils.ColorConstraint.*;
 
 public class UpdateTable {
     private static final TransactionManagerImpl transactionManager = new TransactionManagerImpl();
