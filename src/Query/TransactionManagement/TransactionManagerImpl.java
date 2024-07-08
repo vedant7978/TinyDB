@@ -85,6 +85,7 @@ public class TransactionManagerImpl implements TransactionManager {
         System.out.println(ANSI_GREEN + "Insert operation added to buffer: " + values + ANSI_RESET);
     }
 
+    @Override
     public void addUpdateToTransaction(String tableName, String updateColumn, String updateValue, String conditionColumn, String conditionValue) {
         ArrayList<ArrayList<String>> tableBuffer = buffer.getOrDefault(tableName, new ArrayList<>());
         ArrayList<String> rowValues = new ArrayList<>();

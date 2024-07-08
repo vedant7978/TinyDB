@@ -53,7 +53,7 @@ public class QueryProcessor {
             DropTable.drop(query);
         } else if (query.toLowerCase().startsWith("start transaction")) {
             transactionManager.startTransaction();
-        } else if (query.toLowerCase().startsWith("commit")) {
+        } else if (query.toLowerCase().startsWith("commit transaction")) {
             transactionManager.commitTransaction();
         } else if (query.toLowerCase().startsWith("rollback")) {
             transactionManager.rollbackTransaction();
