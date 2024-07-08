@@ -8,6 +8,7 @@ import Query.Database.CreateDatabase;
 import Query.Database.UseDatabase;
 import Query.Table.CreateTable;
 import Query.Table.DropTable;
+import Query.TransactionManagement.TransactionManagerImpl;
 
 import java.util.Scanner;
 
@@ -15,6 +16,7 @@ import static Utills.ColorConstraint.ANSI_RED;
 import static Utills.ColorConstraint.ANSI_RESET;
 
 public class QueryProcessor {
+    private static TransactionManagerImpl transactionManager = new TransactionManagerImpl();
 
     public static void writeQueries() {
 
@@ -49,6 +51,12 @@ public class QueryProcessor {
             DeleteFromTable.delete(query);
         } else if (query.toLowerCase().startsWith("drop table")) {
             DropTable.drop(query);
+        } else if (query.toLowerCase().startsWith("start transaction")) {
+            transactionManager.startTransaction();
+        } else if (query.toLowerCase().startsWith("commit")) {
+            transactionManager.commitTransaction();
+        } else if (query.toLowerCase().startsWith("rollback")) {
+            transactionManager.rollbackTransaction();
         } else {
             System.out.println(ANSI_RED + "Invalid query. Please enter a valid SQL query." + ANSI_RESET);
         }

@@ -16,7 +16,6 @@ public class TinyDB {
         UserLoginImpl userLogin = new UserLoginImpl();
         UserRegistrationImpl userRegistration = new UserRegistrationImpl();
         Scanner scanner = new Scanner(System.in);
-
         while (true) {
             try {
                 System.out.println("Choose an action: ");

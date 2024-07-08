@@ -1,5 +1,7 @@
 package Query.DataOperations;
 
+import Query.TransactionManagement.TransactionManager;
+import Query.TransactionManagement.TransactionManagerImpl;
 import Utills.RegexPatterns;
 import Utills.TableUtils;
 
@@ -12,6 +14,9 @@ import java.util.regex.Matcher;
 import static Utills.ColorConstraint.*;
 
 public class InsertIntoTable {
+
+    private static final TransactionManager transactionManager = new TransactionManagerImpl();
+
     public static void insert(String query) {
         if (!TableUtils.isDatabaseSelected()) {
             return;
@@ -22,52 +27,62 @@ public class InsertIntoTable {
         if (matcher.matches()) {
             String tableName = matcher.group(1);
             String values = matcher.group(2).replaceAll("\n", "").replaceAll("\r", "").trim();
-
-            File tableFile = TableUtils.getTableFile(tableName);
-            if (tableFile == null) {
-                return;
-            }
-
-            try {
-                List<String> fileLines = TableUtils.readTableFile(tableFile);
-                if (fileLines == null || fileLines.isEmpty()) {
-                    return;
-                }
-
-                String firstLine = fileLines.getFirst();
-                String[] columnDefinitions = firstLine.split("~~");
-                int columnCount = columnDefinitions.length;
-
-                String[] valuesArray = values.split(",");
-                if (valuesArray.length != columnCount) {
-                    System.out.println(ANSI_RED + "Column count (" + columnCount + ") does not match value count (" + valuesArray.length + ")."+ANSI_RESET);
-                    return;
-                }
-
-                boolean primaryKeyValid = validatePrimaryKey(tableFile, columnDefinitions, valuesArray);
-                if (!primaryKeyValid) {
-                    return;
-                }
-
-                StringBuilder formattedValues = new StringBuilder();
-                for (String value : valuesArray) {
-                    if (!formattedValues.isEmpty()) {
-                        formattedValues.append("~~");
-                    }
-                    value = value.trim().replaceAll("^'|'$", "");
-                    formattedValues.append(value);
-                }
-
-                try (FileWriter writer = new FileWriter(tableFile, true)) {
-                    writer.write(System.lineSeparator() + formattedValues);
-                    System.out.println(ANSI_GREEN + "Record inserted successfully." + ANSI_RESET);
-                }
-            } catch (IOException e) {
-                System.out.println(ANSI_RED + "Failed to insert record into table " + tableName + "." + ANSI_RESET);
-                e.printStackTrace();
+//            System.out.println(transactionManager.isTransactionActive());
+            if (transactionManager.isTransactionActive()) {
+                // If a transaction is active, store the query in the buffer
+                transactionManager.addQueryToTransaction(tableName, values);
+            } else {
+                // If no transaction is active, execute the query directly on the table file
+                executeInsert(tableName, values);
             }
         } else {
             System.out.println(ANSI_RED + "Invalid INSERT INTO TABLE query." + ANSI_RESET);
+        }
+    }
+
+    public static void executeInsert(String tableName, String values) {
+        File tableFile = TableUtils.getTableFile(tableName);
+        if (tableFile == null) {
+            return;
+        }
+
+        try {
+            List<String> fileLines = TableUtils.readTableFile(tableFile);
+            if (fileLines == null || fileLines.isEmpty()) {
+                return;
+            }
+
+            String firstLine = fileLines.get(0);
+            String[] columnDefinitions = firstLine.split("~~");
+            int columnCount = columnDefinitions.length;
+
+            String[] valuesArray = values.split(",");
+            if (valuesArray.length != columnCount) {
+                System.out.println(ANSI_RED + "Column count (" + columnCount + ") does not match value count (" + valuesArray.length + ")." + ANSI_RESET);
+                return;
+            }
+
+            boolean primaryKeyValid = validatePrimaryKey(tableFile, columnDefinitions, valuesArray);
+            if (!primaryKeyValid) {
+                return;
+            }
+
+            StringBuilder formattedValues = new StringBuilder();
+            for (String value : valuesArray) {
+                if (formattedValues.length() > 0) {
+                    formattedValues.append("~~");
+                }
+                value = value.trim().replaceAll("^'|'$", "");
+                formattedValues.append(value);
+            }
+
+            try (FileWriter writer = new FileWriter(tableFile, true)) {
+                writer.write(System.lineSeparator() + formattedValues);
+                System.out.println(ANSI_GREEN + "Record inserted successfully." + ANSI_RESET);
+            }
+        } catch (IOException e) {
+            System.out.println(ANSI_RED + "Failed to insert record into table " + tableName + "." + ANSI_RESET);
+            e.printStackTrace();
         }
     }
 
@@ -105,4 +120,5 @@ public class InsertIntoTable {
 
         return true;
     }
+
 }
