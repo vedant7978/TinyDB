@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-import static Utills.ColorConstraint.*;
+import static Utils.ColorConstraint.*;
 
 public class TransactionManagerImpl implements TransactionManager {
 

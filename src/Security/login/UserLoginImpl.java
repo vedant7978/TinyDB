@@ -12,6 +12,7 @@ import static Utils.ColorConstraint.*;
 
 public class UserLoginImpl implements UserLogin {
     private static final Hashing hashing = new Hashing();
+    public static String currentUserID; // Store logged-in user ID
 
     @Override
     public boolean userLogin() throws NoSuchAlgorithmException {
@@ -25,6 +26,7 @@ public class UserLoginImpl implements UserLogin {
             String hashedUserID = hashing.hashData(userID);
             if (isUserIDExists(hashedUserID)) {
                 isUserIDValid = true;
+                currentUserID = userID; // Store the userID of the logged-in user
             } else {
                 System.out.println(ANSI_RED + "User is not valid" + ANSI_RESET);
             }

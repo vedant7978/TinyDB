@@ -18,7 +18,7 @@ public class CreateTable {
     public static void create(String query) {
         if (!TableUtils.isDatabaseSelected()) {
             System.out.println(ANSI_RED + "No database selected." + ANSI_RESET);
-            QueryLog.logUserQuery("system", query, System.currentTimeMillis());
+            QueryLog.logUserQuery(query, System.currentTimeMillis());
             EventLog.logDatabaseChange("No database selected for CREATE TABLE query: " + query);
             return;
         }
@@ -67,16 +67,16 @@ public class CreateTable {
                     System.out.println(ANSI_RED + "Table " + tableName + " already exists." + ANSI_RESET);
                     EventLog.logDatabaseChange("Attempted to create table " + tableName + ", but it already exists.");
                 }
-                QueryLog.logUserQuery("system", query, System.currentTimeMillis());
+                QueryLog.logUserQuery( query, System.currentTimeMillis());
             } else {
                 System.out.println(ANSI_RED + "Invalid CREATE TABLE query format." + ANSI_RESET);
                 EventLog.logDatabaseChange("Invalid CREATE TABLE query format: " + query);
-                QueryLog.logUserQuery("system", query, System.currentTimeMillis());
+                QueryLog.logUserQuery( query, System.currentTimeMillis());
             }
         } else {
             System.out.println(ANSI_RED + "Invalid query. Primary key not specified in the CREATE TABLE statement." + ANSI_RESET);
             EventLog.logDatabaseChange("Invalid CREATE TABLE query. Primary key not specified: " + query);
-            QueryLog.logUserQuery("system", query, System.currentTimeMillis());
+            QueryLog.logUserQuery(query, System.currentTimeMillis());
         }
     }
 }

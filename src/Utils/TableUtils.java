@@ -25,7 +25,7 @@ public class TableUtils {
         String tableFilePath = "./databases/" + UseDatabase.getCurrentDatabase() + "/" + tableName + ".txt";
         File tableFile = new File(tableFilePath);
         if (!tableFile.exists()) {
-            System.out.println(ANSI_RED+"Table file " + tableFile.getAbsolutePath() + " does not exist."+ANSI_RESET);
+            System.out.println(ANSI_RED + "Table file " + tableFile.getAbsolutePath() + " does not exist." + ANSI_RESET);
             return null;
         }
         return tableFile;
@@ -34,7 +34,7 @@ public class TableUtils {
     public static List<String> readTableFile(File tableFile) throws IOException {
         List<String> fileLines = Files.readAllLines(tableFile.toPath());
         if (fileLines.isEmpty()) {
-            System.out.println(ANSI_RED+"Table " + tableFile.getName() + " is empty."+ANSI_RESET);
+            System.out.println(ANSI_RED + "Table " + tableFile.getName() + " is empty." + ANSI_RESET);
             return null;
         }
         return fileLines;
@@ -77,6 +77,7 @@ public class TableUtils {
         }
         return updated;
     }
+
     public static boolean writeTableFile(File tableFile, List<String> fileLines) {
         try (FileWriter writer = new FileWriter(tableFile)) {
             for (String line : fileLines) {
@@ -88,5 +89,23 @@ public class TableUtils {
             e.printStackTrace();
             return false;
         }
+    }
+
+    public static int getTotalRecords(File databaseDirectory) {
+        int totalRecords = 0;
+        for (File tableFile : databaseDirectory.listFiles()) {
+            if (tableFile.isFile()) {
+                try {
+                    List<String> fileLines = readTableFile(tableFile);
+                    if (fileLines != null) {
+                        totalRecords += fileLines.size() - 1; // Subtracting 1 to exclude header line
+                    }
+                } catch (IOException e) {
+                    System.out.println(ANSI_RED + "Failed to read table file " + tableFile.getName() + "." + ANSI_RESET);
+                    e.printStackTrace();
+                }
+            }
+        }
+        return totalRecords;
     }
 }

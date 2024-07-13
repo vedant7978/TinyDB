@@ -14,7 +14,7 @@ public class DropTable {
     public static void drop(String query) {
         if (!TableUtils.isDatabaseSelected()) {
             System.out.println(ANSI_RED + "No database selected." + ANSI_RESET);
-            QueryLog.logUserQuery("system", query, System.currentTimeMillis());
+            QueryLog.logUserQuery(query, System.currentTimeMillis());
             EventLog.logDatabaseChange("No database selected for DROP TABLE query: " + query);
             return;
         }
@@ -27,23 +27,23 @@ public class DropTable {
             if (!tableFile.exists()) {
                 System.out.println(ANSI_RED + "Table " + tableName + " does not exist." + ANSI_RESET);
                 EventLog.logDatabaseChange("Attempted to drop table " + tableName + ", but it does not exist.");
-                QueryLog.logUserQuery("system", query, System.currentTimeMillis());
+                QueryLog.logUserQuery( query, System.currentTimeMillis());
                 return;
             }
 
             if (tableFile.delete()) {
                 System.out.println(ANSI_GREEN + "Table " + tableName + " dropped successfully." + ANSI_RESET);
                 EventLog.logDatabaseChange("Table " + tableName + " dropped successfully.");
-                QueryLog.logUserQuery("system", query, System.currentTimeMillis());
+                QueryLog.logUserQuery(query, System.currentTimeMillis());
             } else {
                 System.out.println(ANSI_RED + "Failed to drop table " + tableName + "." + ANSI_RESET);
                 EventLog.logDatabaseChange("Failed to drop table " + tableName + ".");
-                QueryLog.logUserQuery("system", query, System.currentTimeMillis());
+                QueryLog.logUserQuery(query, System.currentTimeMillis());
             }
         } else {
             System.out.println(ANSI_RED + "Invalid DROP TABLE query." + ANSI_RESET);
             EventLog.logDatabaseChange("Invalid DROP TABLE query: " + query);
-            QueryLog.logUserQuery("system", query, System.currentTimeMillis());
+            QueryLog.logUserQuery(query, System.currentTimeMillis());
         }
     }
 }

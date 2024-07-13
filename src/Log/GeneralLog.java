@@ -14,25 +14,14 @@ public class GeneralLog {
         logFilePath = "./databases/" + databaseName + "/general_log.json";
     }
 
-    public static void logQueryExecutionTime(String query, long executionTime) {
+    public static void log(String query, long executionTime, int numberOfTables, int totalRecords) {
         Map<String, Object> logEntry = new HashMap<>();
-        logEntry.put("type", "general");
         logEntry.put("timestamp", System.currentTimeMillis());
         logEntry.put("details", Map.of(
                 "queryExecutionTime", executionTime,
-                "query", query
-        ));
-
-        writeLogEntry(logEntry);
-    }
-
-    public static void logDatabaseState(int numberOfTables, Map<String, Integer> tableRecords) {
-        Map<String, Object> logEntry = new HashMap<>();
-        logEntry.put("type", "general");
-        logEntry.put("timestamp", System.currentTimeMillis());
-        logEntry.put("details", Map.of(
+                "query", query,
                 "numberOfTables", numberOfTables,
-                "tableRecords", tableRecords
+                "totalRecords", totalRecords
         ));
 
         writeLogEntry(logEntry);
@@ -46,5 +35,3 @@ public class GeneralLog {
         }
     }
 }
-
-
