@@ -17,6 +17,7 @@ import static Utils.ColorConstraint.ANSI_RESET;
 public class CreateDatabase {
     public static void create(String query) {
         String[] parts = query.split(" ");
+        long startTime = System.currentTimeMillis();
 
         if (validateCreateDatabaseQuery(parts)) {
             String databaseName = parts[2];
@@ -24,6 +25,7 @@ public class CreateDatabase {
 
             if (databaseDirectory.exists() && databaseDirectory.isDirectory()) {
                 System.out.println(ANSI_RED + "Database " + databaseName + " already exists." + ANSI_RESET);
+                logQueryAndDatabaseState(query, startTime, databaseName, false, "Database already exists");
             } else {
                 if (databaseDirectory.mkdirs()) {
                     createLogFiles(databaseName);
@@ -31,16 +33,18 @@ public class CreateDatabase {
                     GeneralLog.initialize(databaseName);
                     EventLog.initialize(databaseName);
 
-                    logCreateDatabaseQuery(query, databaseName);
                     EventLog.logDatabaseChange("Created database " + databaseName);
 
                     System.out.println(ANSI_GREEN + "Database " + databaseName + " created successfully." + ANSI_RESET);
+                    logQueryAndDatabaseState(query, startTime, databaseName, true, "Database created successfully");
                 } else {
                     System.out.println(ANSI_RED + "Failed to create database " + databaseName + "." + ANSI_RESET);
+                    logQueryAndDatabaseState(query, startTime, databaseName, false, "Failed to create database");
                 }
             }
         } else {
             System.out.println(ANSI_RED + "Invalid CREATE DATABASE query." + ANSI_RESET);
+            logQueryAndDatabaseState(query, startTime, null, false, "Invalid CREATE DATABASE query");
         }
     }
 
@@ -62,16 +66,19 @@ public class CreateDatabase {
         }
     }
 
-    private static void logCreateDatabaseQuery(String query, String databaseName) {
-        long startTime = System.currentTimeMillis();
-        // Simulate the query execution if needed
-        long endTime = System.currentTimeMillis();
+    private static void logQueryAndDatabaseState(String query, long startTime, String databaseName, boolean success, String statusMessage) {
+        long executionTime = System.currentTimeMillis() - startTime;
 
-        // Log the query
-        QueryLog.logUserQuery("system", query, endTime);
+        int numberOfTables = 0;
+        int totalRecords = 0;
+        if (databaseName != null && success) {
+            File databaseDirectory = new File("./databases/" + databaseName);
+            numberOfTables = databaseDirectory.list().length;
+            totalRecords = Utils.TableUtils.getTotalRecords(databaseDirectory);
+        }
 
-        // Log the database state
-        GeneralLog.logDatabaseState(1, Map.of(databaseName, 0)); // Assuming database starts with 0 tables
-        GeneralLog.logQueryExecutionTime(query, endTime - startTime);
+        GeneralLog.log(query, executionTime, numberOfTables, totalRecords);
+        QueryLog.logUserQuery(query, startTime);
+        EventLog.logDatabaseChange(statusMessage);
     }
 }
