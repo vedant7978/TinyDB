@@ -62,6 +62,8 @@ public class CreateDatabase {
                 }
             } catch (IOException e) {
                 e.printStackTrace();
+                System.out.println(ANSI_RED + "Failed to create log file: " + logFileName + "." + ANSI_RESET);
+                EventLog.logCrashReport("Failed to create log file: " + logFileName + ": " + e.getMessage());
             }
         }
     }
@@ -73,7 +75,7 @@ public class CreateDatabase {
         int totalRecords = 0;
         if (databaseName != null && success) {
             File databaseDirectory = new File("./databases/" + databaseName);
-            numberOfTables = databaseDirectory.list().length;
+            numberOfTables = Utils.TableUtils.getNumberOfTables(databaseName);
             totalRecords = Utils.TableUtils.getTotalRecords(databaseDirectory);
         }
 

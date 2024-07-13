@@ -91,6 +91,22 @@ public class TableUtils {
         }
     }
 
+    public static int getNumberOfTables(String databaseName) {
+        File databaseDirectory = new File("./databases/" + databaseName);
+        if (databaseDirectory.exists() && databaseDirectory.isDirectory()) {
+            // Filter files that are table files (ending with .txt)
+            File[] tableFiles = databaseDirectory.listFiles((dir, name) -> name.endsWith(".txt"));
+            if (tableFiles != null) {
+                return tableFiles.length;
+            } else {
+                System.out.println(ANSI_RED + "Failed to list files in directory " + databaseDirectory.getAbsolutePath() + "." + ANSI_RESET);
+            }
+        } else {
+            System.out.println(ANSI_RED + "Database directory " + databaseDirectory.getAbsolutePath() + " does not exist." + ANSI_RESET);
+        }
+        return 0;
+    }
+
     public static int getTotalRecords(File databaseDirectory) {
         int totalRecords = 0;
         for (File tableFile : databaseDirectory.listFiles()) {
