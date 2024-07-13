@@ -2,8 +2,9 @@ package Query.DataOperations;
 
 import Query.TransactionManagement.TransactionManager;
 import Query.TransactionManagement.TransactionManagerImpl;
-import Utills.RegexPatterns;
-import Utills.TableUtils;
+import Utils.RegexPatterns;
+import Utils.TableUtils;
+import Log.EventLog;
 
 import java.io.File;
 import java.io.IOException;
@@ -11,8 +12,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 
-import static Utills.ColorConstraint.ANSI_RED;
-import static Utills.ColorConstraint.ANSI_RESET;
+import static Utils.ColorConstraint.ANSI_RED;
+import static Utils.ColorConstraint.ANSI_RESET;
 
 public class SelectFromTable {
 
@@ -20,6 +21,8 @@ public class SelectFromTable {
 
     public static void select(String query) {
         if (!TableUtils.isDatabaseSelected()) {
+            System.out.println(ANSI_RED + "No database selected." + ANSI_RESET);
+            EventLog.logDatabaseChange("No database selected for SELECT query: " + query);
             return;
         }
 
@@ -37,16 +40,20 @@ public class SelectFromTable {
                 File tableFile = TableUtils.getTableFile(tableName);
                 if (tableFile == null) {
                     System.out.println(ANSI_RED + "Table " + tableName + " does not exist." + ANSI_RESET);
+                    EventLog.logDatabaseChange("Table " + tableName + " does not exist for SELECT operation.");
                     return;
                 }
                 fileLines = TableUtils.readTableFile(tableFile);
                 if (fileLines == null || fileLines.isEmpty()) {
                     System.out.println(ANSI_RED + "Table " + tableName + " is empty or could not be read." + ANSI_RESET);
+                    EventLog.logDatabaseChange("Table " + tableName + " is empty or could not be read for SELECT operation.");
                     return;
                 }
             } catch (IOException e) {
                 System.out.println(ANSI_RED + "An error occurred while reading the table." + ANSI_RESET);
+                EventLog.logCrashReport("An error occurred while reading the table " + tableName + ": " + e.getMessage());
                 e.printStackTrace();
+                return;
             }
 
             // Read data from transaction buffer
@@ -69,6 +76,7 @@ public class SelectFromTable {
                         bufferLines.add("DELETE," + rowValues.get(1) + "," + rowValues.get(2));
                     }
                 }
+                EventLog.logTransactionEvent("Buffered data read from transaction for table " + tableName);
             }
 
             String[] headers = fileLines.get(0).split("~~");
@@ -83,6 +91,7 @@ public class SelectFromTable {
                 conditionColumnIndex = TableUtils.getColumnIndex(headers, conditionColumn);
                 if (conditionColumnIndex == -1) {
                     System.out.println(ANSI_RED + "Column " + conditionColumn + " not found in table " + tableName + "." + ANSI_RESET);
+                    EventLog.logDatabaseChange("Column " + conditionColumn + " not found in table " + tableName + " for SELECT operation.");
                     return;
                 }
             }
@@ -125,9 +134,11 @@ public class SelectFromTable {
 
             if (!recordFound) {
                 System.out.println(ANSI_RED + "No matching records found for the condition " + conditionColumn + "='" + conditionValue + "'." + ANSI_RESET);
+                EventLog.logDatabaseChange("No matching records found for condition " + conditionColumn + "='" + conditionValue + "' in table " + tableName);
             }
         } else {
             System.out.println(ANSI_RED + "Invalid SELECT query format." + ANSI_RESET);
+            EventLog.logDatabaseChange("Invalid SELECT query format: " + query);
         }
     }
 
@@ -135,7 +146,7 @@ public class SelectFromTable {
         int[] columnIndices;
         if (columnsPart.equals("*")) {
             columnIndices = new int[headers.length];
-            for (int i = 0; i < headers.length;  i++) {
+            for (int i = 0; i < headers.length; i++) {
                 columnIndices[i] = i;
             }
         } else {
@@ -145,6 +156,7 @@ public class SelectFromTable {
                 columnIndices[i] = TableUtils.getColumnIndex(headers, requestedColumns[i].trim());
                 if (columnIndices[i] == -1) {
                     System.out.println(ANSI_RED + "Column " + requestedColumns[i].trim() + " not found in table " + tableName + "." + ANSI_RESET);
+                    EventLog.logDatabaseChange("Column " + requestedColumns[i].trim() + " not found in table " + tableName + " for SELECT operation.");
                     return null;
                 }
             }

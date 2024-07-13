@@ -7,9 +7,9 @@ import java.util.Scanner;
 
 import static ExportData.ExportData.databaseExists;
 import static ExportData.ExportData.exportDatabase;
-import static Utills.ColorConstraint.ANSI_RED;
-import static Utills.ColorConstraint.ANSI_RESET;
-import static Utills.QueryProcessor.writeQueries;
+import static Utils.ColorConstraint.ANSI_RED;
+import static Utils.ColorConstraint.ANSI_RESET;
+import static Utils.QueryProcessor.writeQueries;
 
 public class TinyDB {
     public static void main(String[] args) {

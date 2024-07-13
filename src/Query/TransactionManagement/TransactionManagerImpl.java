@@ -1,5 +1,6 @@
 package Query.TransactionManagement;
 
+import Log.EventLog;
 import Query.DataOperations.DeleteFromTable;
 import Query.DataOperations.InsertIntoTable;
 import Query.DataOperations.UpdateTable;
@@ -8,7 +9,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-import static Utills.ColorConstraint.*;
+import static Utils.ColorConstraint.*;
 
 public class TransactionManagerImpl implements TransactionManager {
 
@@ -22,6 +23,7 @@ public class TransactionManagerImpl implements TransactionManager {
     public void startTransaction() {
         transactionActive = true;
         System.out.println(ANSI_GREEN + "Transaction started." + ANSI_RESET);
+        EventLog.logTransactionEvent("Transaction started.");
     }
 
     @Override
@@ -51,8 +53,10 @@ public class TransactionManagerImpl implements TransactionManager {
             buffer.clear();
             transactionActive = false;
             System.out.println(ANSI_GREEN + "Transaction committed." + ANSI_RESET);
+            EventLog.logTransactionEvent("Transaction committed.");
         } else {
             System.out.println(ANSI_RED + "No active transaction to commit." + ANSI_RESET);
+            EventLog.logTransactionEvent("No active transaction to commit.");
         }
     }
 
@@ -62,8 +66,10 @@ public class TransactionManagerImpl implements TransactionManager {
             buffer.clear();
             transactionActive = false;
             System.out.println(ANSI_GREEN + "Transaction rolled back." + ANSI_RESET);
+            EventLog.logTransactionEvent("Transaction rolled back.");
         } else {
             System.out.println(ANSI_RED + "No active transaction to rollback." + ANSI_RESET);
+            EventLog.logTransactionEvent("No active transaction to rollback.");
         }
     }
 
@@ -83,6 +89,7 @@ public class TransactionManagerImpl implements TransactionManager {
         tableBuffer.add(rowValues);
         buffer.put(tableName, tableBuffer);
         System.out.println(ANSI_GREEN + "Insert operation added to buffer: " + values + ANSI_RESET);
+        EventLog.logTransactionEvent("Insert operation added to buffer: " + values);
     }
 
     @Override
@@ -97,6 +104,7 @@ public class TransactionManagerImpl implements TransactionManager {
         tableBuffer.add(rowValues);
         buffer.put(tableName, tableBuffer);
         System.out.println(ANSI_GREEN + "Update operation added to buffer: " + updateColumn + " = " + updateValue + " WHERE " + conditionColumn + " = " + conditionValue + ANSI_RESET);
+        EventLog.logTransactionEvent("Update operation added to buffer: " + updateColumn + " = " + updateValue + " WHERE " + conditionColumn + " = " + conditionValue);
     }
     public void addDeleteToTransaction(String tableName, String column, String value) {
         ArrayList<ArrayList<String>> tableBuffer = buffer.getOrDefault(tableName, new ArrayList<>());
@@ -107,5 +115,6 @@ public class TransactionManagerImpl implements TransactionManager {
         tableBuffer.add(rowValues);
         buffer.put(tableName, tableBuffer);
         System.out.println(ANSI_GREEN + "Delete operation added to buffer: " + column + " = " + value + ANSI_RESET);
+        EventLog.logTransactionEvent("Delete operation added to buffer: " + column + " = " + value);
     }
 }

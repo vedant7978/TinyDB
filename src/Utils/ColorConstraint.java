@@ -1,4 +1,4 @@
-package Utills;
+package Utils;
 
 public class ColorConstraint {
     public static final String ANSI_RED = "\u001B[31m";

@@ -1,6 +1,6 @@
 package Query.Table;
 
-import Utills.RegexPatterns;
+import Utils.RegexPatterns;
 
 import java.util.regex.Matcher;
 

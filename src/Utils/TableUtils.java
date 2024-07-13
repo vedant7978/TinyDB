@@ -1,4 +1,4 @@
-package Utills;
+package Utils;
 
 import Query.Database.UseDatabase;
 
@@ -8,8 +8,8 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.util.List;
 
-import static Utills.ColorConstraint.ANSI_RED;
-import static Utills.ColorConstraint.ANSI_RESET;
+import static Utils.ColorConstraint.ANSI_RED;
+import static Utils.ColorConstraint.ANSI_RESET;
 
 public class TableUtils {
 
@@ -25,7 +25,7 @@ public class TableUtils {
         String tableFilePath = "./databases/" + UseDatabase.getCurrentDatabase() + "/" + tableName + ".txt";
         File tableFile = new File(tableFilePath);
         if (!tableFile.exists()) {
-            System.out.println(ANSI_RED+"Table file " + tableFile.getAbsolutePath() + " does not exist."+ANSI_RESET);
+            System.out.println(ANSI_RED + "Table file " + tableFile.getAbsolutePath() + " does not exist." + ANSI_RESET);
             return null;
         }
         return tableFile;
@@ -34,7 +34,7 @@ public class TableUtils {
     public static List<String> readTableFile(File tableFile) throws IOException {
         List<String> fileLines = Files.readAllLines(tableFile.toPath());
         if (fileLines.isEmpty()) {
-            System.out.println(ANSI_RED+"Table " + tableFile.getName() + " is empty."+ANSI_RESET);
+            System.out.println(ANSI_RED + "Table " + tableFile.getName() + " is empty." + ANSI_RESET);
             return null;
         }
         return fileLines;
@@ -77,6 +77,7 @@ public class TableUtils {
         }
         return updated;
     }
+
     public static boolean writeTableFile(File tableFile, List<String> fileLines) {
         try (FileWriter writer = new FileWriter(tableFile)) {
             for (String line : fileLines) {
@@ -88,5 +89,39 @@ public class TableUtils {
             e.printStackTrace();
             return false;
         }
+    }
+
+    public static int getNumberOfTables(String databaseName) {
+        File databaseDirectory = new File("./databases/" + databaseName);
+        if (databaseDirectory.exists() && databaseDirectory.isDirectory()) {
+            // Filter files that are table files (ending with .txt)
+            File[] tableFiles = databaseDirectory.listFiles((dir, name) -> name.endsWith(".txt"));
+            if (tableFiles != null) {
+                return tableFiles.length;
+            } else {
+                System.out.println(ANSI_RED + "Failed to list files in directory " + databaseDirectory.getAbsolutePath() + "." + ANSI_RESET);
+            }
+        } else {
+            System.out.println(ANSI_RED + "Database directory " + databaseDirectory.getAbsolutePath() + " does not exist." + ANSI_RESET);
+        }
+        return 0;
+    }
+
+    public static int getTotalRecords(File databaseDirectory) {
+        int totalRecords = 0;
+        for (File tableFile : databaseDirectory.listFiles()) {
+            if (tableFile.isFile()) {
+                try {
+                    List<String> fileLines = readTableFile(tableFile);
+                    if (fileLines != null) {
+                        totalRecords += fileLines.size() - 1; // Subtracting 1 to exclude header line
+                    }
+                } catch (IOException e) {
+                    System.out.println(ANSI_RED + "Failed to read table file " + tableFile.getName() + "." + ANSI_RESET);
+                    e.printStackTrace();
+                }
+            }
+        }
+        return totalRecords;
     }
 }

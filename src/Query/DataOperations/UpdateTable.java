@@ -1,8 +1,9 @@
 package Query.DataOperations;
 
 import Query.TransactionManagement.TransactionManagerImpl;
-import Utills.RegexPatterns;
-import Utills.TableUtils;
+import Utils.RegexPatterns;
+import Utils.TableUtils;
+import Log.EventLog;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -10,13 +11,17 @@ import java.io.IOException;
 import java.util.List;
 import java.util.regex.Matcher;
 
-import static Utills.ColorConstraint.*;
+import static Utils.ColorConstraint.ANSI_RED;
+import static Utils.ColorConstraint.ANSI_GREEN;
+import static Utils.ColorConstraint.ANSI_RESET;
 
 public class UpdateTable {
     private static final TransactionManagerImpl transactionManager = new TransactionManagerImpl();
 
     public static void update(String query) {
         if (!TableUtils.isDatabaseSelected()) {
+            System.out.println(ANSI_RED + "No database selected." + ANSI_RESET);
+            EventLog.logDatabaseChange("No database selected for UPDATE query: " + query);
             return;
         }
 
@@ -32,24 +37,31 @@ public class UpdateTable {
             if (transactionManager.isTransactionActive()) {
                 // If a transaction is active, add the update operation to the buffer
                 transactionManager.addUpdateToTransaction(tableName, updateColumn, updateValue, conditionColumn, conditionValue);
+                EventLog.logTransactionEvent("Update operation buffered for table " + tableName + ": " +
+                        "UPDATE " + updateColumn + " = " + updateValue + " WHERE " + conditionColumn + " = " + conditionValue);
             } else {
                 // If no transaction is active, execute the update directly on the table file
                 executeUpdate(tableName, updateColumn, updateValue, conditionColumn, conditionValue);
             }
         } else {
             System.out.println(ANSI_RED + "Invalid UPDATE query format." + ANSI_RESET);
+            EventLog.logDatabaseChange("Invalid UPDATE query format: " + query);
         }
     }
 
     public static void executeUpdate(String tableName, String updateColumn, String updateValue, String conditionColumn, String conditionValue) {
         File tableFile = TableUtils.getTableFile(tableName);
         if (tableFile == null) {
+            System.out.println(ANSI_RED + "Table " + tableName + " does not exist." + ANSI_RESET);
+            EventLog.logDatabaseChange("Table " + tableName + " does not exist for UPDATE operation.");
             return;
         }
 
         try {
             List<String> fileLines = TableUtils.readTableFile(tableFile);
             if (fileLines == null) {
+                System.out.println(ANSI_RED + "Error reading table file." + ANSI_RESET);
+                EventLog.logCrashReport("Error reading table file for table " + tableName);
                 return;
             }
 
@@ -59,11 +71,13 @@ public class UpdateTable {
 
             if (updateColumnIndex == -1) {
                 System.out.println(ANSI_RED + updateColumn + " not found in table " + tableName + "." + ANSI_RESET);
+                EventLog.logDatabaseChange(updateColumn + " not found in table " + tableName + " for UPDATE operation.");
                 return;
             }
 
             if (conditionColumnIndex == -1) {
                 System.out.println(ANSI_RED + "Column " + conditionColumn + " not found in table " + tableName + "." + ANSI_RESET);
+                EventLog.logDatabaseChange("Column " + conditionColumn + " not found in table " + tableName + " for UPDATE operation.");
                 return;
             }
 
@@ -75,12 +89,17 @@ public class UpdateTable {
                         writer.write(line + System.lineSeparator());
                     }
                     System.out.println(ANSI_GREEN + "Record(s) updated successfully." + ANSI_RESET);
+                    EventLog.logDatabaseChange("Record(s) updated successfully in table " + tableName + ": " +
+                            "UPDATE " + updateColumn + " = " + updateValue + " WHERE " + conditionColumn + " = " + conditionValue);
                 }
             } else {
                 System.out.println(ANSI_RED + "No records matched the condition." + ANSI_RESET);
+                EventLog.logDatabaseChange("No records matched the condition for UPDATE operation in table " + tableName + ": " +
+                        "UPDATE " + updateColumn + " = " + updateValue + " WHERE " + conditionColumn + " = " + conditionValue);
             }
         } catch (IOException e) {
             System.out.println(ANSI_RED + "An error occurred while updating the table." + ANSI_RESET);
+            EventLog.logCrashReport("An error occurred while updating the table " + tableName + ": " + e.getMessage());
             e.printStackTrace();
         }
     }
