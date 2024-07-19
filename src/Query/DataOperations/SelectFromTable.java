@@ -64,7 +64,7 @@ public class SelectFromTable {
                     if ("INSERT".equalsIgnoreCase(operation)) {
                         StringBuilder insertValues = new StringBuilder();
                         for (int i = 1; i < rowValues.size(); i++) {
-                            if (insertValues.length() > 0) {
+                            if (!insertValues.isEmpty()) {
                                 insertValues.append(",");
                             }
                             insertValues.append(rowValues.get(i));
@@ -79,7 +79,7 @@ public class SelectFromTable {
                 EventLog.logTransactionEvent("Buffered data read from transaction for table " + tableName);
             }
 
-            String[] headers = fileLines.get(0).split("~~");
+            String[] headers = fileLines.getFirst().split("~~");
 
             int[] columnIndices = getColumnIndices(columnsPart, headers, tableName);
             if (columnIndices == null) {
@@ -90,8 +90,8 @@ public class SelectFromTable {
             if (conditionColumn != null) {
                 conditionColumnIndex = TableUtils.getColumnIndex(headers, conditionColumn);
                 if (conditionColumnIndex == -1) {
-                    System.out.println(ANSI_RED + "Column " + conditionColumn + " not found in table " + tableName + "." + ANSI_RESET);
-                    EventLog.logDatabaseChange("Column " + conditionColumn + " not found in table " + tableName + " for SELECT operation.");
+                    System.out.println(ANSI_RED + "ColumnDetail " + conditionColumn + " not found in table " + tableName + "." + ANSI_RESET);
+                    EventLog.logDatabaseChange("ColumnDetail " + conditionColumn + " not found in table " + tableName + " for SELECT operation.");
                     return;
                 }
             }
@@ -155,8 +155,8 @@ public class SelectFromTable {
             for (int i = 0; i < requestedColumns.length; i++) {
                 columnIndices[i] = TableUtils.getColumnIndex(headers, requestedColumns[i].trim());
                 if (columnIndices[i] == -1) {
-                    System.out.println(ANSI_RED + "Column " + requestedColumns[i].trim() + " not found in table " + tableName + "." + ANSI_RESET);
-                    EventLog.logDatabaseChange("Column " + requestedColumns[i].trim() + " not found in table " + tableName + " for SELECT operation.");
+                    System.out.println(ANSI_RED + "ColumnDetail " + requestedColumns[i].trim() + " not found in table " + tableName + "." + ANSI_RESET);
+                    EventLog.logDatabaseChange("ColumnDetail " + requestedColumns[i].trim() + " not found in table " + tableName + " for SELECT operation.");
                     return null;
                 }
             }

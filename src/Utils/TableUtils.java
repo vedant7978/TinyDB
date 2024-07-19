@@ -2,11 +2,9 @@ package Utils;
 
 import Query.Database.UseDatabase;
 
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
 import java.nio.file.Files;
-import java.util.List;
+import java.util.*;
 
 import static Utils.ColorConstraint.ANSI_RED;
 import static Utils.ColorConstraint.ANSI_RESET;
@@ -78,19 +76,6 @@ public class TableUtils {
         return updated;
     }
 
-    public static boolean writeTableFile(File tableFile, List<String> fileLines) {
-        try (FileWriter writer = new FileWriter(tableFile)) {
-            for (String line : fileLines) {
-                writer.write(line + System.lineSeparator());
-            }
-            return true;
-        } catch (IOException e) {
-            System.out.println(ANSI_RED + "Failed to write to table file " + tableFile.getName() + "." + ANSI_RESET);
-            e.printStackTrace();
-            return false;
-        }
-    }
-
     public static int getNumberOfTables(String databaseName) {
         File databaseDirectory = new File("./databases/" + databaseName);
         if (databaseDirectory.exists() && databaseDirectory.isDirectory()) {
@@ -123,5 +108,141 @@ public class TableUtils {
             }
         }
         return totalRecords;
+    }
+
+    public static boolean isNotNullConstraint(String tableName, String columnName) {
+        File tableFile = getTableFile(tableName);
+        if (tableFile == null) {
+            return false;
+        }
+
+        try (BufferedReader reader = new BufferedReader(new FileReader(tableFile))) {
+            // Read the first line which contains column definitions with constraints
+            String line = reader.readLine();
+            if (line == null) {
+                return false;
+            }
+            String[] columns = line.split("~~");
+            for (String column : columns) {
+                String[] parts = column.split("\\s+");
+                if (parts[0].equals(columnName) && column.toUpperCase().contains("NN")) {
+                    return true;
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return false;
+    }
+
+    // Method to check for UNIQUE constraint
+    public static boolean isUniqueConstraint(String tableName, String columnName) {
+        File tableFile = getTableFile(tableName);
+        if (tableFile == null) {
+            return false;
+        }
+
+        try (BufferedReader reader = new BufferedReader(new FileReader(tableFile))) {
+            // Read the first line which contains column definitions with constraints
+            String line = reader.readLine();
+            if (line == null) {
+                return false;
+            }
+            String[] columns = line.split("~~");
+            for (String column : columns) {
+                String[] parts = column.split("\\s+");
+                if (parts[0].equals(columnName) && column.toUpperCase().contains("U")) {
+                    return true;
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return false;
+    }
+
+    public static boolean isValueExists(File tableFile, int columnIndex, String value) throws IOException {
+        List<String> fileLines = readTableFile(tableFile);
+        for (String line : fileLines.subList(1, fileLines.size())) {
+            String[] values = line.split("~~");
+            if (values[columnIndex].equals(value)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public static String getPrimaryKeyColumnName(String tableName) {
+        File tableFile = TableUtils.getTableFile(tableName);
+        if (tableFile == null) {
+            System.out.println("Table " + tableName + " does not exist.");
+            return null;
+        }
+
+        try (BufferedReader reader = new BufferedReader(new FileReader(tableFile))) {
+            String firstLine = reader.readLine();
+            if (firstLine != null && !firstLine.trim().isEmpty()) {
+                String[] columns = firstLine.split("~~");
+                for (String column : columns) {
+                    if (column.contains("(PK)")) {
+                        return column.split("\\s+")[0]; // Assuming column name is first word before (PK)
+                    }
+                }
+            }
+        } catch (IOException e) {
+            System.out.println("Error reading table file: " + e.getMessage());
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public static List<String> getAllTables(String databaseName) {
+        List<String> tables = new ArrayList<>();
+        File databaseDir = new File("./databases/" + databaseName);
+
+        // Check if the database directory exists
+        if (databaseDir.exists() && databaseDir.isDirectory()) {
+            // List all files ending with ".txt" (representing tables)
+            File[] tableFiles = databaseDir.listFiles((dir, name) -> name.endsWith(".txt"));
+            if (tableFiles != null) {
+                for (File tableFile : tableFiles) {
+                    tables.add(tableFile.getName().replace(".txt", ""));
+                }
+            }
+        } else {
+            System.out.println("Database " + databaseName + " does not exist or is not a directory.");
+        }
+
+        return tables;
+    }
+
+    public static List<String> getColumnNames(String databaseName, String tableName) {
+        List<String> columnNames = new ArrayList<>();
+        File tableFile = new File("./databases/" + databaseName + "/" + tableName + ".txt");
+
+        // Check if the table file exists
+        if (!tableFile.exists() || !tableFile.isFile()) {
+            System.out.println("Table " + tableName + " does not exist in database " + databaseName + ".");
+            return columnNames;
+        }
+
+        try (BufferedReader reader = new BufferedReader(new FileReader(tableFile))) {
+            String line = reader.readLine();
+            if (line != null) {
+                // Split the line by "~~" and get the first part (column name)
+                String[] columns = line.split("~~");
+                for (String column : columns) {
+                    // Get only the column name before the first space
+                    String columnName = column.trim().split(" ")[0];
+                    columnNames.add(columnName);
+                }
+            }
+        } catch (IOException e) {
+            System.out.println("Error reading table file: " + e.getMessage());
+        }
+
+        return columnNames;
     }
 }
