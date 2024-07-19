@@ -34,7 +34,7 @@ public class UserLoginImpl implements UserLogin {
 
         boolean isAuthenticated = false;
         while (!isAuthenticated) {
-            System.out.println("Enter password");
+            System.out.println("Enter password:");
             String password = scanner.nextLine();
             String hashedPassword = hashing.hashData(password);
             isAuthenticated = authenticateUser(hashedPassword);

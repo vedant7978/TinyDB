@@ -1,7 +1,8 @@
 package Query.Table;
 
+import Utils.MenuUtils;
+
 import java.util.ArrayList;
-import java.util.InputMismatchException;
 import java.util.List;
 import java.util.Scanner;
 
@@ -27,7 +28,7 @@ public class ForeignKeyHandler {
 
                 if (foreignKeyColumn.equalsIgnoreCase("exit")) {
                     System.out.println(ANSI_RED + "Foreign key addition canceled." + ANSI_RESET);
-                    displayUserOptions();
+                    MenuUtils.displayUserOptions();
                     return;
                 }
 
@@ -63,7 +64,7 @@ public class ForeignKeyHandler {
 
                     if (referencedTable.equalsIgnoreCase("exit")) {
                         System.out.println(ANSI_RED + "Foreign key addition canceled." + ANSI_RESET);
-                        displayUserOptions();
+                        MenuUtils.displayUserOptions();
                         return;
                     }
 
@@ -92,7 +93,7 @@ public class ForeignKeyHandler {
 
                     if (referencedColumn.equalsIgnoreCase("exit")) {
                         System.out.println(ANSI_RED + "Foreign key addition canceled." + ANSI_RESET);
-                        displayUserOptions();
+                        MenuUtils.displayUserOptions();
                         return;
                     }
 
@@ -170,38 +171,5 @@ public class ForeignKeyHandler {
             }
         }
         return false;
-    }
-
-    private static void displayUserOptions() {
-        System.out.println(ANSI_GREEN + "Please choose one of the following options:" + ANSI_RESET);
-        System.out.println("1. Retry foreign key addition");
-        System.out.println("2. Continue without foreign key");
-        System.out.println("3. Cancel table creation");
-
-        Scanner scanner = new Scanner(System.in);
-        try {
-            int choice = scanner.nextInt();
-            switch (choice) {
-                case 1:
-                    // Retry foreign key addition
-                    System.out.println(ANSI_GREEN + "Retrying foreign key addition..." + ANSI_RESET);
-                    break;
-                case 2:
-                    // Continue without foreign key
-                    System.out.println(ANSI_GREEN + "Continuing without foreign key..." + ANSI_RESET);
-                    break;
-                case 3:
-                    // Cancel table creation
-                    System.out.println(ANSI_RED + "Table creation canceled." + ANSI_RESET);
-                    break;
-                default:
-                    System.out.println(ANSI_RED + "Invalid choice. Please select a valid option." + ANSI_RESET);
-                    displayUserOptions();
-                    break;
-            }
-        } catch (InputMismatchException e) {
-            System.out.println(ANSI_RED + "Invalid input. Please enter a number." + ANSI_RESET);
-            displayUserOptions();
-        }
     }
 }
