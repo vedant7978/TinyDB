@@ -30,7 +30,7 @@ public class ExportData {
                     .filter(Files::isRegularFile)
                     .forEach(tablePath -> {
                         String tableName = tablePath.getFileName().toString();
-                        tableName = tableName.substring(0, tableName.lastIndexOf(".")); // Remove file extension
+                        tableName = tableName.substring(0, tableName.lastIndexOf("."));
                         try {
                             sqlDump.add(exportStructureOfTable(tablePath, tableName));
                             sqlDump.add(exportDataOfData(tablePath, tableName));

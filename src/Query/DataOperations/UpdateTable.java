@@ -65,7 +65,7 @@ public class UpdateTable {
                 return;
             }
 
-            String[] columns = fileLines.get(0).split("~~");
+            String[] columns = fileLines.getFirst().split("~~");
             int updateColumnIndex = TableUtils.getColumnIndex(columns, updateColumn);
             int conditionColumnIndex = TableUtils.getColumnIndex(columns, conditionColumn);
 
@@ -76,8 +76,25 @@ public class UpdateTable {
             }
 
             if (conditionColumnIndex == -1) {
-                System.out.println(ANSI_RED + "Column " + conditionColumn + " not found in table " + tableName + "." + ANSI_RESET);
-                EventLog.logDatabaseChange("Column " + conditionColumn + " not found in table " + tableName + " for UPDATE operation.");
+                System.out.println(ANSI_RED + "ColumnDetail " + conditionColumn + " not found in table " + tableName + "." + ANSI_RESET);
+                EventLog.logDatabaseChange("ColumnDetail " + conditionColumn + " not found in table " + tableName + " for UPDATE operation.");
+                return;
+            }
+
+            String primaryKeyColumn = TableUtils.getPrimaryKeyColumnName(tableName);
+            boolean isPrimaryKey = updateColumn.equals(primaryKeyColumn);
+
+            // Check for NOT NULL constraint
+            if (("NULL".equalsIgnoreCase(updateValue) || updateValue.isEmpty()) && (TableUtils.isNotNullConstraint(tableName, updateColumn) || isPrimaryKey)) {
+                System.out.println(ANSI_RED + "Cannot update " + updateColumn + " to NULL as it has a NOT NULL constraint." + ANSI_RESET);
+                EventLog.logDatabaseChange("Cannot update " + updateColumn + " to NULL as it has a NOT NULL constraint in table " + tableName);
+                return;
+            }
+
+            // Check for UNIQUE constraint
+            if ((TableUtils.isUniqueConstraint(tableName, updateColumn) || isPrimaryKey) && TableUtils.isValueExists(tableFile, updateColumnIndex, updateValue)) {
+                System.out.println(ANSI_RED + "Cannot update " + updateColumn + " to " + updateValue + " as it must be unique." + ANSI_RESET);
+                EventLog.logDatabaseChange("Cannot update " + updateColumn + " to " + updateValue + " as it must be unique in table " + tableName);
                 return;
             }
 

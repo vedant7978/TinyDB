@@ -3,13 +3,14 @@ package Query.Database;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.Map;
+
 
 import Log.GeneralLog;
 import Log.QueryLog;
 import Log.EventLog;
 
 import static Query.Database.DatabaseQueryValidator.validateCreateDatabaseQuery;
+import static Utils.DatabaseUtils.getTotalRecords;
 import static Utils.ColorConstraint.ANSI_GREEN;
 import static Utils.ColorConstraint.ANSI_RED;
 import static Utils.ColorConstraint.ANSI_RESET;
@@ -76,7 +77,7 @@ public class CreateDatabase {
         if (databaseName != null && success) {
             File databaseDirectory = new File("./databases/" + databaseName);
             numberOfTables = Utils.TableUtils.getNumberOfTables(databaseName);
-            totalRecords = Utils.TableUtils.getTotalRecords(databaseDirectory);
+            totalRecords = getTotalRecords(databaseDirectory);
         }
 
         GeneralLog.log(query, executionTime, numberOfTables, totalRecords);
