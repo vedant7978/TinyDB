@@ -32,7 +32,7 @@ public class SelectFromTable {
             String columnsPart = matcher.group(1);
             String tableName = matcher.group(2);
             String conditionColumn = matcher.group(3);
-            String conditionValue = matcher.group(4);
+            String conditionValue = matcher.group(5);
 
             List<String> fileLines = new ArrayList<>();
             try {

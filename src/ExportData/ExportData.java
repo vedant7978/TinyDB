@@ -28,6 +28,7 @@ public class ExportData {
             List<String> sqlDump = new ArrayList<>();
             Files.walk(Paths.get(databasePath))
                     .filter(Files::isRegularFile)
+                    .filter(path -> !path.toString().contains("logs"))
                     .forEach(tablePath -> {
                         String tableName = tablePath.getFileName().toString();
                         tableName = tableName.substring(0, tableName.lastIndexOf("."));

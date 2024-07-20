@@ -58,10 +58,13 @@ public class MenuUtils {
         String databaseName;
 
         while (true) {
-            System.out.print("Enter the database name to export: ");
+            System.out.print("Enter the database name to export (or type 'exit' to return to the main menu): ");
             databaseName = scanner.nextLine();
+            if (databaseName.equalsIgnoreCase("exit")) {
+                return;
+            }
             if (databaseExists(databaseName)) {
-                System.out.println("Exporting data and structure...");
+                System.out.println(ANSI_GREEN + "Exporting data and structure..." + ANSI_RESET);
                 exportDatabase(databaseName);
                 break;
             } else {
@@ -75,10 +78,13 @@ public class MenuUtils {
         String databaseName;
 
         while (true) {
-            System.out.print("Enter the database name to generate ERD: ");
+            System.out.print("Enter the database name to generate ERD (or type 'exit' to return to the main menu): ");
             databaseName = scanner.nextLine();
+            if (databaseName.equalsIgnoreCase("exit")) {
+                return;
+            }
             if (databaseExists(databaseName)) {
-                System.out.println(ANSI_GREEN + "Generating the ERD....." + ANSI_RESET);
+                System.out.println(ANSI_GREEN + "Generating the ERD..." + ANSI_RESET);
                 generateERD(databaseName);
                 break;
             } else {
