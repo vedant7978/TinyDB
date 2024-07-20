@@ -114,7 +114,8 @@ public class ForeignKeyHandler {
             String finalColumnsDefinition = updateColumnsDefinition(columnsDefinition, foreignKeyConstraints);
             CreateTable.createTableWithForeignKey(tableName, finalColumnsDefinition);
         } else {
-            CreateTable.createTableWithForeignKey(tableName, columnsDefinition);
+            String formattedColumnsDefinition = formatColumnsDefinition(columnsDefinition);
+            CreateTable.createTableWithForeignKey(tableName, formattedColumnsDefinition);
         }
     }
 
@@ -161,6 +162,15 @@ public class ForeignKeyHandler {
         }
 
         return updatedColumnsDefinition.toString();
+    }
+
+    private static String formatColumnsDefinition(String columnsDefinition) {
+        String formattedColumnsDefinition = columnsDefinition
+                .replaceAll("(?i)\\bPRIMARY KEY\\b", "(PK)")
+                .replaceAll("(?i)\\bNOT NULL\\b", "(NN)")
+                .replaceAll("(?i)\\bUNIQUE\\b", "(U)")
+                .replaceAll(",\\s*", "~~");
+        return formattedColumnsDefinition;
     }
 
     private static boolean isColumnInDefinition(String columnsDefinition, String columnName) {

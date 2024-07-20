@@ -32,7 +32,6 @@ public class TableUtils {
     public static List<String> readTableFile(File tableFile) throws IOException {
         List<String> fileLines = Files.readAllLines(tableFile.toPath());
         if (fileLines.isEmpty()) {
-            System.out.println(ANSI_RED + "Table " + tableFile.getName() + " is empty." + ANSI_RESET);
             return null;
         }
         return fileLines;
