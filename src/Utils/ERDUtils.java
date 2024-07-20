@@ -138,19 +138,8 @@ public class ERDUtils {
             writer.newLine();
             for (Map.Entry<String, ColumnDetail> columnEntry : tableEntry.getValue().entrySet()) {
                 String columnName = columnEntry.getKey();
-                ColumnDetail detail = columnEntry.getValue();
-                writer.write("  - " + columnName + ": ");
+                writer.write("  - " + columnName);
                 writer.newLine();
-                writer.write("      -TYPE=" + detail.getType());
-                writer.newLine();
-                if (detail.getConstraints() != null) {
-                    writer.write("      -CONSTRAINT=" + mapConstraints(detail.getConstraints()));
-                    writer.newLine();
-                }
-                if (detail.getReference() != null) {
-                    writer.write("      -REFERENCE=" + detail.getReference());
-                    writer.newLine();
-                }
             }
             writer.newLine();
         }
@@ -168,7 +157,7 @@ public class ERDUtils {
 
                 String cardinality = determineCardinality(sourceDetail);
 
-                writer.write("- " + sourceTable + " -> " + fk.getTargetTable() + "." + fk.getTargetColumn() + " (" + cardinality + ")");
+                writer.write("- " + sourceTable +"."+sourceColumn+ " -> " + fk.getTargetTable() + "." + fk.getTargetColumn() + " (" + cardinality + ")");
                 writer.newLine();
             }
         }
@@ -181,30 +170,5 @@ public class ERDUtils {
             }
         }
         return "Many to One";
-    }
-
-    private static String mapConstraints(String constraints) {
-        String[] constraintArray = constraints.split(" ");
-        StringBuilder mappedConstraints = new StringBuilder();
-        for (String constraint : constraintArray) {
-            if (!mappedConstraints.isEmpty()) {
-                mappedConstraints.append(" ");
-            }
-            switch (constraint) {
-                case "(PK)":
-                    mappedConstraints.append("PRIMARY KEY");
-                    break;
-                case "(NN)":
-                    mappedConstraints.append("NOT NULL");
-                    break;
-                case "(U)":
-                    mappedConstraints.append("UNIQUE");
-                    break;
-                default:
-                    mappedConstraints.append(constraint);
-                    break;
-            }
-        }
-        return mappedConstraints.toString();
     }
 }
