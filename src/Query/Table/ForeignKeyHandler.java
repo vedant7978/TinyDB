@@ -144,7 +144,6 @@ public class ForeignKeyHandler {
                 updatedColumn = new StringBuilder(updatedColumn.toString().replaceAll("(?i)\\bUNIQUE\\b", "").trim() + " (U)");
             }
 
-            // Append foreign key constraints to the appropriate columns
             for (String foreignKeyConstraint : foreignKeyConstraints) {
                 if (foreignKeyConstraint.startsWith(updatedColumn.toString().split(" ")[0])) {
                     updatedColumn.append(" ").append(foreignKeyConstraint.substring(foreignKeyConstraint.indexOf("REFERENCES")));
