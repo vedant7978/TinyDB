@@ -88,7 +88,8 @@ public class ForeignKeyHandler {
 
                 String referencedColumn = "";
                 while (true) {
-                    System.out.print("Enter the column name to which you want to add the foreign key for column " + foreignKeyColumn + ": ");
+                    System.out.print("Enter the column name to which you want to add the foreign key for column " + foreignKeyColumn + " (only unique or primary key columns will be shown)"+": ");
+
                     referencedColumn = scanner.nextLine().trim();
 
                     if (referencedColumn.equalsIgnoreCase("exit")) {

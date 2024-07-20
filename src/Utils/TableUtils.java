@@ -193,12 +193,16 @@ public class TableUtils {
         try (BufferedReader reader = new BufferedReader(new FileReader(tableFile))) {
             String line = reader.readLine();
             if (line != null) {
-                // Split the line by "~~" and get the first part (column name)
+                // Split the line by "~~" and process each column definition
                 String[] columns = line.split("~~");
                 for (String column : columns) {
-                    // Get only the column name before the first space
-                    String columnName = column.trim().split(" ")[0];
-                    columnNames.add(columnName);
+                    String trimmedColumn = column.trim();
+                    // Check if the column contains either (PK) or (U)
+                    if (trimmedColumn.contains("(PK)") || trimmedColumn.contains("(U)")) {
+                        // Get only the column name before the first space
+                        String columnName = trimmedColumn.split(" ")[0];
+                        columnNames.add(columnName);
+                    }
                 }
             }
         } catch (IOException e) {
