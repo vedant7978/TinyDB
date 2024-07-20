@@ -30,9 +30,9 @@ public class UpdateTable {
         if (matcher.matches()) {
             String tableName = matcher.group(1);
             String updateColumn = matcher.group(2);
-            String updateValue = matcher.group(3);
-            String conditionColumn = matcher.group(4);
-            String conditionValue = matcher.group(5);
+            String updateValue = matcher.group(4);
+            String conditionColumn = matcher.group(5);
+            String conditionValue = matcher.group(7);
 
             if (transactionManager.isTransactionActive()) {
                 // If a transaction is active, add the update operation to the buffer
