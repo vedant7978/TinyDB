@@ -39,14 +39,9 @@ public class UseDatabase {
                 GeneralLog.log(query, executionTime, numberOfTables, totalRecords);
             } else {
                 System.out.println(ANSI_RED + "Database " + databaseName + " does not exist." + ANSI_RESET);
-
-                // Log the failed attempt to use a database
-                EventLog.logDatabaseChange("Attempted to use non-existent database " + databaseName);
-                QueryLog.logUserQuery(query, startTime);
             }
         } else {
             System.out.println(ANSI_RED + "Invalid USE DATABASE query." + ANSI_RESET);
-
             // Log the invalid query
             EventLog.logDatabaseChange("Invalid USE DATABASE query: " + query);
             QueryLog.logUserQuery(query, startTime);

@@ -10,14 +10,30 @@ import java.util.*;
 public class JSONUtility {
 
     public static void writeLogEntry(String logFilePath, Map<String, Object> logEntry) {
+        if (logFilePath == null || logFilePath.isEmpty()) {
+            System.err.println("Log file path is null or empty.");
+            return;
+        }
+
         File logFile = new File(logFilePath);
         String newLogEntry = mapToJson(logEntry);
 
         try {
+            // Ensure the parent directories exist
+            File parentDir = logFile.getParentFile();
+            if (parentDir != null && !parentDir.exists()) {
+                if (!parentDir.mkdirs()) {
+                    System.err.println("Error creating directories: " + parentDir.getPath());
+                    return;
+                }
+            }
+
             // If the log file does not exist, create it and add the opening bracket
             if (!logFile.exists()) {
-                logFile.getParentFile().mkdirs();
-                logFile.createNewFile();
+                if (!logFile.createNewFile()) {
+                    System.err.println("Error creating log file: " + logFilePath);
+                    return;
+                }
                 try (FileWriter file = new FileWriter(logFilePath, true)) {
                     file.write("[\n");
                 }
@@ -43,7 +59,7 @@ public class JSONUtility {
             }
 
         } catch (IOException e) {
-            e.printStackTrace();
+            System.err.println("Error writing log entry: " + e.getMessage());
         }
     }
 
