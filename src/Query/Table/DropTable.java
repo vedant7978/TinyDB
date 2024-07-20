@@ -10,6 +10,7 @@ import java.io.File;
 import static Query.Database.UseDatabase.getCurrentDatabase;
 import static Query.Table.DatabaseTableValidator.validateDropTable;
 import static Utils.ColorConstraint.*;
+import static Utils.DatabaseUtils.getTotalRecords;
 
 public class DropTable {
     public static void drop(String query) {
@@ -47,7 +48,7 @@ public class DropTable {
         long startTime = System.currentTimeMillis();
         String databaseName = getCurrentDatabase();
         int numberOfTables = TableUtils.getNumberOfTables(databaseName);
-        int totalRecords = TableUtils.getTotalRecords(new File("./databases/" + databaseName));
+        int totalRecords = getTotalRecords(new File("./databases/" + databaseName));
 
         GeneralLog.log(query, System.currentTimeMillis() - startTime, numberOfTables, totalRecords);
         QueryLog.logUserQuery(query, startTime);

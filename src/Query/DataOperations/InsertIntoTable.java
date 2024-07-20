@@ -30,6 +30,7 @@ public class InsertIntoTable {
         if (matcher.matches()) {
             String tableName = matcher.group(1);
             String values = matcher.group(2).replaceAll("\n", "").replaceAll("\r", "").trim();
+            values = values.replaceAll("'", "");
 
             if (transactionManager.isTransactionActive()) {
                 // If a transaction is active, store the query in the buffer
@@ -62,26 +63,35 @@ public class InsertIntoTable {
                 return;
             }
 
-            String firstLine = fileLines.get(0);
+            String firstLine = fileLines.getFirst();
             String[] columnDefinitions = firstLine.split("~~");
             int columnCount = columnDefinitions.length;
 
             String[] valuesArray = values.split(",");
             if (valuesArray.length != columnCount) {
-                System.out.println(ANSI_RED + "Column count (" + columnCount + ") does not match value count (" + valuesArray.length + ")." + ANSI_RESET);
-                EventLog.logDatabaseChange("Column count (" + columnCount + ") does not match value count (" + valuesArray.length + ") for table " + tableName);
+                System.out.println(ANSI_RED + "ColumnDetail count (" + columnCount + ") does not match value count (" + valuesArray.length + ")." + ANSI_RESET);
+                EventLog.logDatabaseChange("ColumnDetail count (" + columnCount + ") does not match value count (" + valuesArray.length + ") for table " + tableName);
                 return;
             }
 
-            boolean primaryKeyValid = validatePrimaryKey(tableFile, columnDefinitions, valuesArray);
-            if (!primaryKeyValid) {
-                EventLog.logDatabaseChange("Invalid primary key for table " + tableName + " with values: " + valuesArray);
-                return;
+            for (int i = 0; i < columnDefinitions.length; i++) {
+                if (columnDefinitions[i].contains("(PK)")) {
+                    if (!validateNotNull(valuesArray[i]) || !validateUnique(tableFile, i, valuesArray[i])) {
+                        return;
+                    }
+                } else {
+                    if (columnDefinitions[i].contains("(NN)") && !validateNotNull(valuesArray[i])) {
+                        return;
+                    }
+                    if (columnDefinitions[i].contains("(U)") && !validateUnique(tableFile, i, valuesArray[i])) {
+                        return;
+                    }
+                }
             }
 
             StringBuilder formattedValues = new StringBuilder();
             for (String value : valuesArray) {
-                if (formattedValues.length() > 0) {
+                if (!formattedValues.isEmpty()) {
                     formattedValues.append("~~");
                 }
                 value = value.trim().replaceAll("^'|'$", "");
@@ -100,41 +110,32 @@ public class InsertIntoTable {
         }
     }
 
-    private static boolean validatePrimaryKey(File tableFile, String[] columnDefinitions, String[] valuesArray) {
-        int primaryKeyIndex = -1;
-        for (int i = 0; i < columnDefinitions.length; i++) {
-            if (columnDefinitions[i].contains("(PK)")) {
-                primaryKeyIndex = i;
-                break;
-            }
-        }
-
-        if (valuesArray.length <= primaryKeyIndex || valuesArray[primaryKeyIndex].isEmpty()) {
-            System.out.println(ANSI_RED + "Primary key column cannot be null." + ANSI_RESET);
-            EventLog.logDatabaseChange("Primary key column cannot be null for table " + tableFile.getName());
+    private static boolean validateNotNull(String value) {
+        if (value == null || value.trim().isEmpty()) {
+            System.out.println(ANSI_RED + "NOT NULL constraint violated." + ANSI_RESET);
             return false;
         }
+        return true;
+    }
 
+    private static boolean validateUnique(File tableFile, int columnIndex, String value) {
         try {
             List<String> fileLines = TableUtils.readTableFile(tableFile);
             if (fileLines != null && fileLines.size() > 1) {
-                String primaryKeyValue = valuesArray[primaryKeyIndex].trim();
+                String uniqueValue = value.trim();
                 for (int i = 1; i < fileLines.size(); i++) {
                     String[] existingValues = fileLines.get(i).split("~~");
-                    if (existingValues.length > primaryKeyIndex && existingValues[primaryKeyIndex].trim().equals(primaryKeyValue)) {
-                        System.out.println(ANSI_RED + "Duplicate primary key value." + ANSI_RESET);
-                        EventLog.logDatabaseChange("Duplicate primary key value (" + primaryKeyValue + ") found in table " + tableFile.getName());
+                    if (existingValues.length > columnIndex && existingValues[columnIndex].trim().equals(uniqueValue)) {
+                        System.out.println(ANSI_RED + "Unique constraint violated." + ANSI_RESET);
                         return false;
                     }
                 }
             }
         } catch (IOException e) {
-            System.out.println(ANSI_RED + "Error reading table file for primary key validation." + ANSI_RESET);
-            EventLog.logCrashReport("Error reading table file " + tableFile.getName() + " for primary key validation: " + e.getMessage());
+            System.out.println(ANSI_RED + "Error reading table file for unique constraint validation." + ANSI_RESET);
             e.printStackTrace();
             return false;
         }
-
         return true;
     }
 }

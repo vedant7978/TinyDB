@@ -3,6 +3,8 @@ package Query.Database;
 import java.io.File;
 import static Query.Database.DatabaseQueryValidator.validateUseDatabaseQuery;
 import static Utils.ColorConstraint.*;
+import static Utils.DatabaseUtils.getTotalRecords;
+
 import Log.EventLog;
 import Log.GeneralLog;
 import Log.QueryLog;
@@ -32,7 +34,7 @@ public class UseDatabase {
 
                 long executionTime = System.currentTimeMillis() - startTime;
                 int numberOfTables = databaseDirectory.list().length; // Assuming each table is a file in the directory
-                int totalRecords = TableUtils.getTotalRecords(databaseDirectory);
+                int totalRecords = getTotalRecords(databaseDirectory);
 
                 GeneralLog.log(query, executionTime, numberOfTables, totalRecords);
             } else {

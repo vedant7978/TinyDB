@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.regex.Matcher;
 
 import static Utils.ColorConstraint.*;
+import static Utils.TableUtils.getPrimaryKeyColumnName;
 
 public class DeleteFromTable {
 
@@ -30,6 +31,10 @@ public class DeleteFromTable {
             String tableName = matcher.group(1);
             String column = matcher.group(2);
             String value = matcher.group(3);
+
+            if (value != null) {
+                value = value.replace("'", "");
+            }
 
             if (transactionManager.isTransactionActive()) {
                 // If a transaction is active, store the delete operation in the buffer
@@ -62,30 +67,39 @@ public class DeleteFromTable {
                 return;
             }
 
-            if (column == null && value == null) {
-                // No WHERE clause, delete all records
-                fileLines.subList(1, fileLines.size()).clear(); // Keep the header, remove all other lines
-                TableUtils.writeTableFile(tableFile, fileLines);
-                System.out.println(ANSI_GREEN + "All records deleted successfully from table " + tableName + "." + ANSI_RESET);
-                EventLog.logDatabaseChange("All records deleted from table " + tableName);
-            } else {
-                String firstLine = fileLines.get(0);
-                String[] columns = firstLine.split("~~");
-                int columnIndex = TableUtils.getColumnIndex(columns, column);
-                if (columnIndex == -1) {
-                    System.out.println(ANSI_RED + "Column " + column + " not found in table " + tableName + "." + ANSI_RESET);
-                    EventLog.logDatabaseChange("Column " + column + " not found in table " + tableName);
-                    return;
-                }
+            // Get the primary key column name
+            String primaryKeyColumn = getPrimaryKeyColumnName(tableName);
+            if (primaryKeyColumn == null) {
+                System.out.println(ANSI_RED + "Primary key column not found for table " + tableName + "." + ANSI_RESET);
+                EventLog.logDatabaseChange("Primary key column not found for table " + tableName);
+                return;
+            }
 
-                boolean recordFound = TableUtils.removeRecord(fileLines, columnIndex, value, tableFile);
-                if (recordFound) {
-                    System.out.println(ANSI_GREEN + "Record deleted successfully." + ANSI_RESET);
-                    EventLog.logDatabaseChange("Record with " + column + " = " + value + " deleted successfully from table " + tableName);
-                } else {
-                    System.out.println(ANSI_RED + "The specified data was not found in the table." + ANSI_RESET);
-                    EventLog.logDatabaseChange("The specified data (" + column + " = " + value + ") was not found in table " + tableName);
-                }
+            // Check if the specified column in the WHERE clause matches the primary key column
+            if (!column.equalsIgnoreCase(primaryKeyColumn)) {
+                System.out.println(ANSI_RED + "Only deletion by primary key (" + primaryKeyColumn + ") is supported." + ANSI_RESET);
+                EventLog.logDatabaseChange("Delete operation failed. Only deletion by primary key (" + primaryKeyColumn + ") is supported for table " + tableName);
+                return;
+            }
+
+            // Find the index of the primary key in the record lines
+            String firstLine = fileLines.getFirst();
+            String[] columns = firstLine.split("~~");
+            int columnIndex = TableUtils.getColumnIndex(columns, column);
+            if (columnIndex == -1) {
+                System.out.println(ANSI_RED + "ColumnDetail " + column + " not found in table " + tableName + "." + ANSI_RESET);
+                EventLog.logDatabaseChange("ColumnDetail " + column + " not found in table " + tableName);
+                return;
+            }
+
+            // Remove the record if found based on primary key value
+            boolean recordFound = TableUtils.removeRecord(fileLines, columnIndex, value, tableFile);
+            if (recordFound) {
+                System.out.println(ANSI_GREEN + "Record deleted successfully." + ANSI_RESET);
+                EventLog.logDatabaseChange("Record with " + column + " = " + value + " deleted successfully from table " + tableName);
+            } else {
+                System.out.println(ANSI_RED + "The specified data was not found in the table." + ANSI_RESET);
+                EventLog.logDatabaseChange("The specified data (" + column + " = " + value + ") was not found in table " + tableName);
             }
         } catch (IOException e) {
             System.out.println(ANSI_RED + "Failed to delete record from table " + tableName + "." + ANSI_RESET);
