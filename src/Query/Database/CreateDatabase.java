@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 
-
 import Log.GeneralLog;
 import Log.QueryLog;
 import Log.EventLog;
@@ -50,22 +49,30 @@ public class CreateDatabase {
     }
 
     private static void createLogFiles(String databaseName) {
-        String[] logFileNames = {"general_log.json", "event_log.json", "query_log.json"};
-        for (String logFileName : logFileNames) {
-            File logFile = new File("./databases/" + databaseName + "/" + logFileName);
-            try {
-                if (logFile.createNewFile()) {
-                    try (FileWriter writer = new FileWriter(logFile)) {
-                        writer.write("[]"); // Initialize file with empty JSON array
+        String logsDirectoryPath = "./databases/" + databaseName + "/logs";
+        File logsDirectory = new File(logsDirectoryPath);
+
+        if (logsDirectory.mkdirs()) {
+            String[] logFileNames = {"general_log.json", "event_log.json", "query_log.json"};
+            for (String logFileName : logFileNames) {
+                File logFile = new File(logsDirectory, logFileName);
+                try {
+                    if (logFile.createNewFile()) {
+                        try (FileWriter writer = new FileWriter(logFile)) {
+                            writer.write("[]"); // Initialize file with empty JSON array
+                        }
+                    } else {
+                        System.out.println(ANSI_RED + "Failed to create log file: " + logFileName + "." + ANSI_RESET);
                     }
-                } else {
+                } catch (IOException e) {
+                    e.printStackTrace();
                     System.out.println(ANSI_RED + "Failed to create log file: " + logFileName + "." + ANSI_RESET);
+                    EventLog.logCrashReport("Failed to create log file: " + logFileName + ": " + e.getMessage());
                 }
-            } catch (IOException e) {
-                e.printStackTrace();
-                System.out.println(ANSI_RED + "Failed to create log file: " + logFileName + "." + ANSI_RESET);
-                EventLog.logCrashReport("Failed to create log file: " + logFileName + ": " + e.getMessage());
             }
+        } else {
+            System.out.println(ANSI_RED + "Failed to create logs directory." + ANSI_RESET);
+            EventLog.logCrashReport("Failed to create logs directory for database: " + databaseName);
         }
     }
 
