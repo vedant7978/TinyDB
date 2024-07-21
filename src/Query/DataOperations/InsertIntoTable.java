@@ -18,6 +18,11 @@ public class InsertIntoTable {
 
     private static final TransactionManager transactionManager = new TransactionManagerImpl();
 
+    /**
+     * Inserts records into the table based on the query.
+     *
+     * @param query the INSERT INTO query string
+     */
     public static void insert(String query) {
         if (!TableUtils.isDatabaseSelected()) {
             System.out.println(ANSI_RED + "No database selected." + ANSI_RESET);
@@ -47,6 +52,12 @@ public class InsertIntoTable {
         }
     }
 
+    /**
+     * Executes the insert operation on the specified table.
+     *
+     * @param tableName the name of the table
+     * @param values the values to insert into the table
+     */
     public static void executeInsert(String tableName, String values) {
         File tableFile = TableUtils.getTableFile(tableName);
         if (tableFile == null) {
@@ -110,6 +121,12 @@ public class InsertIntoTable {
         }
     }
 
+    /**
+     * Validates that the value is not null or empty.
+     *
+     * @param value the value to validate
+     * @return true if the value is not null or empty, false otherwise
+     */
     private static boolean validateNotNull(String value) {
         if (value == null || value.trim().isEmpty()) {
             System.out.println(ANSI_RED + "NOT NULL constraint violated." + ANSI_RESET);
@@ -118,6 +135,15 @@ public class InsertIntoTable {
         return true;
     }
 
+    /**
+     * Validates that the value is unique in the specified column.
+     *
+     * @param tableFile the table file
+     * @param columnIndex the index of the column to check for uniqueness
+     * @param value the value to check for uniqueness
+     * @return true if the value is unique, false otherwise
+     * @throws IOException if an I/O error occurs
+     */
     private static boolean validateUnique(File tableFile, int columnIndex, String value) {
         try {
             List<String> fileLines = TableUtils.readTableFile(tableFile);

@@ -18,6 +18,13 @@ import static Utils.ColorConstraint.ANSI_RESET;
 public class QueryProcessor {
     private static final TransactionManagerImpl transactionManager = new TransactionManagerImpl();
 
+    /**
+     * Reads and executes SQL queries entered by the user.
+     * <p>
+     * Handles various SQL commands including CREATE DATABASE, USE, CREATE TABLE, INSERT INTO, SELECT, UPDATE, DELETE FROM, DROP TABLE,
+     * START TRANSACTION, COMMIT TRANSACTION, and ROLLBACK.
+     * </p>
+     */
     public static void writeQueries() {
 
         Scanner scanner = new Scanner(System.in);

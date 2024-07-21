@@ -15,6 +15,12 @@ import static Utils.ColorConstraint.ANSI_RED;
 import static Utils.ColorConstraint.ANSI_RESET;
 
 public class CreateDatabase {
+
+    /**
+     * Creates a new database based on the provided query.
+     *
+     * @param query the CREATE DATABASE query
+     */
     public static void create(String query) {
         String[] parts = query.split(" ");
         long startTime = System.currentTimeMillis();
@@ -47,7 +53,11 @@ public class CreateDatabase {
             logQueryAndDatabaseState(query, startTime, null, false, "Invalid CREATE DATABASE query");
         }
     }
-
+    /**
+     * Creates log files for the new database.
+     *
+     * @param databaseName the name of the database for which log files are created
+     */
     private static void createLogFiles(String databaseName) {
         String logsDirectoryPath = "./databases/" + databaseName + "/logs";
         File logsDirectory = new File(logsDirectoryPath);
@@ -76,6 +86,15 @@ public class CreateDatabase {
         }
     }
 
+    /**
+     * Logs query and database state information.
+     *
+     * @param query          the query executed
+     * @param startTime      the start time of the query execution
+     * @param databaseName   the name of the database
+     * @param success        the success status of the query
+     * @param statusMessage  the status message to log
+     */
     private static void logQueryAndDatabaseState(String query, long startTime, String databaseName, boolean success, String statusMessage) {
         long executionTime = System.currentTimeMillis() - startTime;
 

@@ -11,6 +11,12 @@ import static Utils.QueryProcessor.writeQueries;
 
 public class MenuUtils {
 
+    /**
+     * Displays user options and handles user input for various actions.
+     * <p>
+     * Actions include writing queries, exporting data and structure, generating ERD, and exiting the application.
+     * </p>
+     */
     public static void displayUserOptions() {
         Scanner scanner = new Scanner(System.in);
         while (true) {
@@ -52,7 +58,12 @@ public class MenuUtils {
             }
         }
     }
-
+    /**
+     * Prompts the user to enter a database name and exports its data and structure.
+     * <p>
+     * Repeats the prompt until a valid database name is provided or the user types 'exit'.
+     * </p>
+     */
     private static void exportDataAndStructure() {
         Scanner scanner = new Scanner(System.in);
         String databaseName;
@@ -72,7 +83,12 @@ public class MenuUtils {
             }
         }
     }
-
+    /**
+     * Prompts the user to enter a database name and generates an ERD for the specified database.
+     * <p>
+     * Repeats the prompt until a valid database name is provided or the user types 'exit'.
+     * </p>
+     */
     private static void erd() {
         Scanner scanner = new Scanner(System.in);
         String databaseName;

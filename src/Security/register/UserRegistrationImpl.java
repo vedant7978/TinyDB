@@ -52,6 +52,11 @@ public class UserRegistrationImpl implements UserRegister {
         UserRegistrationImpl.securityAnswer2 = securityAnswer2;
     }
 
+    /**
+     * Handles the user registration process.
+     *
+     * @throws NoSuchAlgorithmException if hashing algorithm is not found.
+     */
     public void userRegistration() throws NoSuchAlgorithmException {
         Scanner scanner = new Scanner(System.in);
 

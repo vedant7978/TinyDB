@@ -11,8 +11,19 @@ import static Utils.ColorConstraint.*;
 import static Utils.TableUtils.getColumnNames;
 import static Utils.DatabaseUtils.getAllTables;
 
+
+/**
+ * Handles the addition of foreign key constraints to tables.
+ */
 public class ForeignKeyHandler {
 
+
+    /**
+     * Handles the addition of foreign keys to a table.
+     *
+     * @param tableName The name of the table.
+     * @param columnsDefinition The columns definition string.
+     */
     public static void handleForeignKey(String tableName, String columnsDefinition) {
         Scanner scanner = new Scanner(System.in);
         System.out.print("Do you want to add a foreign key? (yes/no): ");
@@ -119,6 +130,13 @@ public class ForeignKeyHandler {
         }
     }
 
+    /**
+     * Updates the columns definition to include foreign key constraints.
+     *
+     * @param columnsDefinition The original columns definition string.
+     * @param foreignKeyConstraints The list of foreign key constraints to add.
+     * @return The updated columns definition with foreign key constraints.
+     */
     private static String updateColumnsDefinition(String columnsDefinition, List<String> foreignKeyConstraints) {
         StringBuilder updatedColumnsDefinition = new StringBuilder();
         String[] columns = columnsDefinition.split(",\\s*");
@@ -164,6 +182,12 @@ public class ForeignKeyHandler {
         return updatedColumnsDefinition.toString();
     }
 
+    /**
+     * Formats the columns definition by adding constraint labels.
+     *
+     * @param columnsDefinition The columns definition string.
+     * @return The formatted columns definition with labels for primary key, not null, and unique constraints.
+     */
     private static String formatColumnsDefinition(String columnsDefinition) {
         String formattedColumnsDefinition = columnsDefinition
                 .replaceAll("(?i)\\bPRIMARY KEY\\b", "(PK)")
@@ -173,6 +197,13 @@ public class ForeignKeyHandler {
         return formattedColumnsDefinition;
     }
 
+    /**
+     * Checks if a column is present in the columns definition.
+     *
+     * @param columnsDefinition The columns definition string.
+     * @param columnName The name of the column to check.
+     * @return True if the column is present, otherwise false.
+     */
     private static boolean isColumnInDefinition(String columnsDefinition, String columnName) {
         String[] columns = columnsDefinition.split(",\\s*");
         for (String column : columns) {

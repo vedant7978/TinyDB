@@ -13,6 +13,12 @@ import Utils.TableUtils;
 public class UseDatabase {
     private static String currentDatabase = null;
 
+
+    /**
+     * Switches to the specified database based on the provided query.
+     *
+     * @param query the USE DATABASE query
+     */
     public static void use(String query) {
         String[] parts = query.split(" ");
         long startTime = System.currentTimeMillis();
@@ -48,10 +54,19 @@ public class UseDatabase {
         }
     }
 
+    /**
+     * Gets the current database in use.
+     *
+     * @return the name of the current database
+     */
     public static String getCurrentDatabase() {
         return currentDatabase;
     }
-
+    /**
+     * Checks if a database is currently selected.
+     *
+     * @return true if a database is selected, false otherwise
+     */
     public static boolean isDatabaseSelected() {
         return currentDatabase != null;
     }

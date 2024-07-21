@@ -14,6 +14,13 @@ public class UserLoginImpl implements UserLogin {
     private static final Hashing hashing = new Hashing();
     public static String currentUserID; // Store logged-in user ID
 
+
+    /**
+     * Handles the user login process.
+     *
+     * @return true if login is successful, false otherwise.
+     * @throws NoSuchAlgorithmException if hashing algorithm is not found.
+     */
     @Override
     public boolean userLogin() throws NoSuchAlgorithmException {
         Scanner scanner = new Scanner(System.in);
@@ -48,6 +55,12 @@ public class UserLoginImpl implements UserLogin {
         return false;
     }
 
+    /**
+     * Checks if the given hashed userID exists in the user credentials file.
+     *
+     * @param hashedUserID The hashed userID to check.
+     * @return true if the userID exists, false otherwise.
+     */
     @Override
     public boolean isUserIDExists(String hashedUserID) {
         File userCredentials = new File("./userdata/User_Profile.txt");
@@ -70,6 +83,13 @@ public class UserLoginImpl implements UserLogin {
         }
     }
 
+
+    /**
+     * Authenticates the user by checking the hashed password and answering security questions.
+     *
+     * @param hashedPassword The hashed password to check.
+     * @return true if authentication is successful, false otherwise.
+     */
     @Override
     public boolean authenticateUser(String hashedPassword) {
         Scanner scanner = new Scanner(System.in);

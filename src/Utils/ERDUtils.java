@@ -13,8 +13,18 @@ import java.util.regex.Pattern;
 
 import static Utils.ColorConstraint.*;
 
+/**
+ * Utility class for handling Entity-Relationship Diagrams (ERD).
+ */
 public class ERDUtils {
 
+    /**
+     * Retrieves column details for a specified table in a database.
+     *
+     * @param databaseName the name of the database
+     * @param tableName the name of the table
+     * @return a map of column names to their details
+     */
     public static Map<String, ColumnDetail> getColumnDetails(String databaseName, String tableName) {
         Map<String, ColumnDetail> columnDetails = new HashMap<>();
         File tableFile = new File("./databases/" + databaseName + "/" + tableName + ".txt");
@@ -75,6 +85,12 @@ public class ERDUtils {
         return null;
     }
 
+    /**
+     * Retrieves foreign key relationships from column details.
+     *
+     * @param columns a map of column names to their details
+     * @return a list of foreign keys
+     */
     public static List<ForeignKey> getForeignKeys(Map<String, ColumnDetail> columns) {
         List<ForeignKey> fkList = new ArrayList<>();
         for (Map.Entry<String, ColumnDetail> entry : columns.entrySet()) {
@@ -92,6 +108,12 @@ public class ERDUtils {
         return fkList;
     }
 
+    /**
+     * Creates a directory for storing ERD files for a specific database.
+     *
+     * @param databaseName the name of the database
+     * @return the created directory file, or null if creation failed
+     */
     public static File createErdFolder(String databaseName) {
         File erdMainFolder = new File("./ERD");
         if (!erdMainFolder.exists()) {
@@ -113,6 +135,14 @@ public class ERDUtils {
         return erdFolder;
     }
 
+    /**
+     * Writes ERD information to a file.
+     *
+     * @param outputPath the path to the output file
+     * @param databaseName the name of the database
+     * @param tableDetails a map of table names to their column details
+     * @param foreignKeys a map of table names to lists of foreign keys
+     */
     public static void writeErdToFile(String outputPath, String databaseName, Map<String, Map<String, ColumnDetail>> tableDetails, Map<String, List<ForeignKey>> foreignKeys) {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(outputPath))) {
             writer.write("# ERD Overview");
