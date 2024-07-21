@@ -32,6 +32,7 @@ public class ForeignKeyHandler {
         if (response.equals("yes")) {
             List<String> foreignKeyColumns = new ArrayList<>();
             List<String> foreignKeyConstraints = new ArrayList<>();
+            List<String> foreignKeyRelations = new ArrayList<>();
 
             while (true) {
                 System.out.print("For which column do you want to add the foreign key? (type 'done' to finish adding foreign keys, 'exit' to cancel): ");
@@ -50,7 +51,7 @@ public class ForeignKeyHandler {
                 if (isColumnInDefinition(columnsDefinition, foreignKeyColumn)) {
                     foreignKeyColumns.add(foreignKeyColumn);
                 } else {
-                    System.out.println(ANSI_RED + "ColumnDetail " + foreignKeyColumn + " does not exist in the table definition." + ANSI_RESET);
+                    System.out.println(ANSI_RED + "Column " + foreignKeyColumn + " does not exist in the table definition." + ANSI_RESET);
                 }
             }
 
@@ -99,7 +100,7 @@ public class ForeignKeyHandler {
 
                 String referencedColumn = "";
                 while (true) {
-                    System.out.print("Enter the column name to which you want to add the foreign key for column " + foreignKeyColumn + " (only unique or primary key columns will be shown)"+": ");
+                    System.out.print("Enter the column name to which you want to add the foreign key for column " + foreignKeyColumn + " (only unique or primary key columns will be shown): ");
 
                     referencedColumn = scanner.nextLine().trim();
 
@@ -112,17 +113,23 @@ public class ForeignKeyHandler {
                     if (referencedColumns.contains(referencedColumn)) {
                         break;
                     } else {
-                        System.out.println(ANSI_RED + "ColumnDetail " + referencedColumn + " does not exist in the table " + referencedTable + "." + ANSI_RESET);
+                        System.out.println(ANSI_RED + "Column " + referencedColumn + " does not exist in the table " + referencedTable + "." + ANSI_RESET);
                     }
                 }
 
-                // Add foreign key constraint directly to the column definition
+                // Prompt the user for the relationship type
+                System.out.print("Enter the relationship between the tables (e.g., 'enroll', 'contains'): ");
+                String relationship = scanner.nextLine().trim();
+
+                // Add foreign key constraint and relationship directly to the column definition
                 String foreignKeyConstraint = foreignKeyColumn + " REFERENCES " + referencedTable + "(" + referencedColumn + ")";
+                String foreignKeyRelation = foreignKeyColumn + " RELATION(" + relationship + ")";
                 foreignKeyConstraints.add(foreignKeyConstraint);
-                System.out.println(ANSI_GREEN + "Foreign key added successfully: " + foreignKeyConstraint + ANSI_RESET);
+                foreignKeyRelations.add(foreignKeyRelation);
+                System.out.println(ANSI_GREEN + "Foreign key added successfully: " + foreignKeyConstraint + " with relation " + relationship + ANSI_RESET);
             }
 
-            String finalColumnsDefinition = updateColumnsDefinition(columnsDefinition, foreignKeyConstraints);
+            String finalColumnsDefinition = updateColumnsDefinition(columnsDefinition, foreignKeyConstraints, foreignKeyRelations);
             CreateTable.createTableWithForeignKey(tableName, finalColumnsDefinition);
         } else {
             String formattedColumnsDefinition = formatColumnsDefinition(columnsDefinition);
@@ -131,13 +138,14 @@ public class ForeignKeyHandler {
     }
 
     /**
-     * Updates the columns definition to include foreign key constraints.
+     * Updates the columns definition to include foreign key constraints and relationships.
      *
      * @param columnsDefinition The original columns definition string.
      * @param foreignKeyConstraints The list of foreign key constraints to add.
-     * @return The updated columns definition with foreign key constraints.
+     * @param foreignKeyRelations The list of foreign key relationships to add.
+     * @return The updated columns definition with foreign key constraints and relationships.
      */
-    private static String updateColumnsDefinition(String columnsDefinition, List<String> foreignKeyConstraints) {
+    private static String updateColumnsDefinition(String columnsDefinition, List<String> foreignKeyConstraints, List<String> foreignKeyRelations) {
         StringBuilder updatedColumnsDefinition = new StringBuilder();
         String[] columns = columnsDefinition.split(",\\s*");
         boolean firstColumn = true;
@@ -166,6 +174,13 @@ public class ForeignKeyHandler {
             for (String foreignKeyConstraint : foreignKeyConstraints) {
                 if (foreignKeyConstraint.startsWith(updatedColumn.toString().split(" ")[0])) {
                     updatedColumn.append(" ").append(foreignKeyConstraint.substring(foreignKeyConstraint.indexOf("REFERENCES")));
+                    break;
+                }
+            }
+
+            for (String foreignKeyRelation : foreignKeyRelations) {
+                if (foreignKeyRelation.startsWith(updatedColumn.toString().split(" ")[0])) {
+                    updatedColumn.append(" ").append(foreignKeyRelation.substring(foreignKeyRelation.indexOf("RELATION")));
                     break;
                 }
             }
