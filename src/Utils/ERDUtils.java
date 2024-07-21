@@ -13,18 +13,8 @@ import java.util.regex.Pattern;
 
 import static Utils.ColorConstraint.*;
 
-/**
- * Utility class for handling Entity-Relationship Diagrams (ERD).
- */
 public class ERDUtils {
 
-    /**
-     * Retrieves column details for a specified table in a database.
-     *
-     * @param databaseName the name of the database
-     * @param tableName the name of the table
-     * @return a map of column names to their details
-     */
     public static Map<String, ColumnDetail> getColumnDetails(String databaseName, String tableName) {
         Map<String, ColumnDetail> columnDetails = new HashMap<>();
         File tableFile = new File("./databases/" + databaseName + "/" + tableName + ".txt");
@@ -47,14 +37,15 @@ public class ERDUtils {
                         String type = extractType(columnAttributes);
                         String constraints = extractConstraints(columnAttributes);
                         String reference = extractReference(columnAttributes);
+                        String relation = extractRelation(columnAttributes);
 
-                        ColumnDetail detail = new ColumnDetail(type, constraints, reference);
+                        ColumnDetail detail = new ColumnDetail(type, constraints, reference, relation);
                         columnDetails.put(columnName, detail);
                     }
                 }
             }
         } catch (IOException e) {
-            System.out.println(ANSI_RED+"Error reading table file: " + e.getMessage()+ANSI_RESET);
+            System.out.println(ANSI_RED + "Error reading table file: " + e.getMessage() + ANSI_RESET);
         }
 
         return columnDetails;
@@ -71,8 +62,12 @@ public class ERDUtils {
 
         String constraintsPart = columnAttributes.substring(typeEndIndex).trim();
         int refIndex = constraintsPart.indexOf("REFERENCES");
+        int relIndex = constraintsPart.indexOf("RELATION");
+
         if (refIndex >= 0) {
             constraintsPart = constraintsPart.substring(0, refIndex).trim();
+        } else if (relIndex >= 0) {
+            constraintsPart = constraintsPart.substring(0, relIndex).trim();
         }
         return constraintsPart.replaceAll(" +", " ").trim();
     }
@@ -80,17 +75,28 @@ public class ERDUtils {
     private static String extractReference(String columnAttributes) {
         int refIndex = columnAttributes.indexOf("REFERENCES");
         if (refIndex >= 0) {
+            int relIndex = columnAttributes.indexOf("RELATION");
+            if (relIndex >= 0) {
+                return columnAttributes.substring(refIndex + "REFERENCES".length(), relIndex).trim();
+            }
             return columnAttributes.substring(refIndex + "REFERENCES".length()).trim();
         }
         return null;
     }
 
-    /**
-     * Retrieves foreign key relationships from column details.
-     *
-     * @param columns a map of column names to their details
-     * @return a list of foreign keys
-     */
+    private static String extractRelation(String columnAttributes) {
+        int relIndex = columnAttributes.indexOf("RELATION");
+        if (relIndex >= 0) {
+            String relation = columnAttributes.substring(relIndex + "RELATION".length()).trim();
+            // Remove any surrounding brackets
+            if (relation.startsWith("(") && relation.endsWith(")")) {
+                relation = relation.substring(1, relation.length() - 1).trim();
+            }
+            return relation;
+        }
+        return null;
+    }
+
     public static List<ForeignKey> getForeignKeys(Map<String, ColumnDetail> columns) {
         List<ForeignKey> fkList = new ArrayList<>();
         for (Map.Entry<String, ColumnDetail> entry : columns.entrySet()) {
@@ -101,19 +107,14 @@ public class ERDUtils {
                 if (matcher.find()) {
                     String targetTable = matcher.group(1);
                     String targetColumn = matcher.group(2);
-                    fkList.add(new ForeignKey(entry.getKey(), targetTable, targetColumn));
+                    String relation = entry.getValue().getRelation();
+                    fkList.add(new ForeignKey(entry.getKey(), targetTable, targetColumn, relation));
                 }
             }
         }
         return fkList;
     }
 
-    /**
-     * Creates a directory for storing ERD files for a specific database.
-     *
-     * @param databaseName the name of the database
-     * @return the created directory file, or null if creation failed
-     */
     public static File createErdFolder(String databaseName) {
         File erdMainFolder = new File("./ERD");
         if (!erdMainFolder.exists()) {
@@ -126,7 +127,7 @@ public class ERDUtils {
         File erdFolder = new File("./ERD/" + databaseName);
         if (!erdFolder.exists()) {
             if (erdFolder.mkdirs()) {
-                System.out.println(ANSI_GREEN+"Created directory: " + erdFolder.getAbsolutePath()+ANSI_RESET);
+                System.out.println(ANSI_GREEN + "Created directory: " + erdFolder.getAbsolutePath() + ANSI_RESET);
             } else {
                 System.out.println("Failed to create directory: " + erdFolder.getAbsolutePath());
                 return null;
@@ -135,17 +136,9 @@ public class ERDUtils {
         return erdFolder;
     }
 
-    /**
-     * Writes ERD information to a file.
-     *
-     * @param outputPath the path to the output file
-     * @param databaseName the name of the database
-     * @param tableDetails a map of table names to their column details
-     * @param foreignKeys a map of table names to lists of foreign keys
-     */
     public static void writeErdToFile(String outputPath, String databaseName, Map<String, Map<String, ColumnDetail>> tableDetails, Map<String, List<ForeignKey>> foreignKeys) {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(outputPath))) {
-            writer.write("# ERD Overview");
+            writer.write("ERD");
             writer.newLine();
             writer.write("Database: " + databaseName);
             writer.newLine();
@@ -169,6 +162,7 @@ public class ERDUtils {
             for (Map.Entry<String, ColumnDetail> columnEntry : tableEntry.getValue().entrySet()) {
                 String columnName = columnEntry.getKey();
                 writer.write("  - " + columnName);
+
                 writer.newLine();
             }
             writer.newLine();
@@ -187,7 +181,10 @@ public class ERDUtils {
 
                 String cardinality = determineCardinality(sourceDetail);
 
-                writer.write("- " + sourceTable +"."+sourceColumn+ " -> " + fk.getTargetTable() + "." + fk.getTargetColumn() + " (" + cardinality + ")");
+                writer.write("- " + sourceTable + "." + sourceColumn + " -> " + fk.getTargetTable() + "." + fk.getTargetColumn() + " (" + cardinality + ")");
+                if (fk.getRelation() != null) {
+                    writer.write(" RELATION(" + fk.getRelation() + ")");
+                }
                 writer.newLine();
             }
         }
@@ -201,4 +198,5 @@ public class ERDUtils {
         }
         return "Many to One";
     }
+
 }
