@@ -17,6 +17,11 @@ public class DeleteFromTable {
 
     private static final TransactionManager transactionManager = new TransactionManagerImpl();
 
+    /**
+     * Deletes records from the table based on the query.
+     *
+     * @param query the DELETE query string
+     */
     public static void delete(String query) {
         if (!TableUtils.isDatabaseSelected()) {
             System.out.println(ANSI_RED + "No database selected." + ANSI_RESET);
@@ -50,6 +55,13 @@ public class DeleteFromTable {
         }
     }
 
+    /**
+     * Executes the delete operation on the specified table.
+     *
+     * @param tableName the name of the table
+     * @param column the column to match for deletion
+     * @param value the value to match for deletion
+     */
     public static void executeDelete(String tableName, String column, String value) {
         File tableFile = TableUtils.getTableFile(tableName);
         if (tableFile == null) {

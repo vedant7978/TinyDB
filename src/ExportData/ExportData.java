@@ -11,12 +11,23 @@ import java.util.List;
 
 public class ExportData {
 
+    /**
+     * Checks if the specified database exists.
+     *
+     * @param databaseName the name of the database to check
+     * @return true if the database exists, false otherwise
+     */
     public static boolean databaseExists(String databaseName) {
         String databasesPath = "./databases";
         String databasePath = databasesPath + "/" + databaseName;
         return Files.isDirectory(Paths.get(databasePath));
     }
 
+    /**
+     * Exports the specified database to a SQL file.
+     *
+     * @param databaseName the name of the database to export
+     */
     public static void exportDatabase(String databaseName) {
         String databasesPath = "./databases";
         String exportPath = "./ExportFiles";
@@ -47,6 +58,14 @@ public class ExportData {
         }
     }
 
+    /**
+     * Exports the structure of the specified table.
+     *
+     * @param path      the path to the table file
+     * @param tableName the name of the table
+     * @return the SQL string for creating the table
+     * @throws IOException if an I/O error occurs
+     */
     private static String exportStructureOfTable(Path path, String tableName) throws IOException {
         List<String> lines = Files.readAllLines(path);
         StringBuilder sql = new StringBuilder();
@@ -64,6 +83,14 @@ public class ExportData {
         return sql.toString();
     }
 
+    /**
+     * Exports the data of the specified table.
+     *
+     * @param path      the path to the table file
+     * @param tableName the name of the table
+     * @return the SQL string for inserting the data into the table
+     * @throws IOException if an I/O error occurs
+     */
     private static String exportDataOfData(Path path, String tableName) throws IOException {
         List<String> lines = Files.readAllLines(path);
         StringBuilder sql = new StringBuilder();
@@ -88,6 +115,13 @@ public class ExportData {
         return sql.toString();
     }
 
+    /**
+     * Saves the given content to a file.
+     *
+     * @param content  the list of strings to write to the file
+     * @param filename the name of the file to save the content in
+     * @throws IOException if an I/O error occurs
+     */
     private static void saveToFile(List<String> content, String filename) throws IOException {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(filename))) {
             for (String line : content) {

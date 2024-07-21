@@ -19,13 +19,18 @@ public class TransactionManagerImpl implements TransactionManager {
     // Flag to indicate if a transaction is active
     public static boolean transactionActive = false;
 
+    /**
+     * Starts a new transaction.
+     */
     @Override
     public void startTransaction() {
         transactionActive = true;
         System.out.println(ANSI_GREEN + "Transaction started." + ANSI_RESET);
         EventLog.logTransactionEvent("Transaction started.");
     }
-
+    /**
+     * Commits the current transaction, applying all buffered operations to the database.
+     */
     @Override
     public void commitTransaction() {
         if (transactionActive) {
@@ -60,6 +65,9 @@ public class TransactionManagerImpl implements TransactionManager {
         }
     }
 
+    /**
+     * Rolls back the current transaction, discarding all buffered operations.
+     */
     @Override
     public void rollbackTransaction() {
         if (transactionActive) {
@@ -73,11 +81,22 @@ public class TransactionManagerImpl implements TransactionManager {
         }
     }
 
+    /**
+     * Checks if a transaction is currently active.
+     *
+     * @return True if a transaction is active, otherwise false.
+     */
     @Override
     public boolean isTransactionActive() {
         return transactionActive;
     }
 
+    /**
+     * Adds an INSERT operation to the transaction buffer.
+     *
+     * @param tableName The name of the table where the operation will be performed.
+     * @param values The values to be inserted, formatted as a comma-separated string.
+     */
     @Override
     public void addQueryToTransaction(String tableName, String values) {
         ArrayList<ArrayList<String>> tableBuffer = buffer.getOrDefault(tableName, new ArrayList<>());
@@ -92,6 +111,15 @@ public class TransactionManagerImpl implements TransactionManager {
         EventLog.logTransactionEvent("Insert operation added to buffer: " + values);
     }
 
+    /**
+     * Adds an UPDATE operation to the transaction buffer.
+     *
+     * @param tableName The name of the table where the operation will be performed.
+     * @param updateColumn The column to be updated.
+     * @param updateValue The new value for the column.
+     * @param conditionColumn The column to be used in the WHERE clause.
+     * @param conditionValue The value to be matched in the WHERE clause.
+     */
     @Override
     public void addUpdateToTransaction(String tableName, String updateColumn, String updateValue, String conditionColumn, String conditionValue) {
         ArrayList<ArrayList<String>> tableBuffer = buffer.getOrDefault(tableName, new ArrayList<>());
@@ -106,6 +134,13 @@ public class TransactionManagerImpl implements TransactionManager {
         System.out.println(ANSI_GREEN + "Update operation added to buffer: " + updateColumn + " = " + updateValue + " WHERE " + conditionColumn + " = " + conditionValue + ANSI_RESET);
         EventLog.logTransactionEvent("Update operation added to buffer: " + updateColumn + " = " + updateValue + " WHERE " + conditionColumn + " = " + conditionValue);
     }
+    /**
+     * Adds a DELETE operation to the transaction buffer.
+     *
+     * @param tableName The name of the table where the operation will be performed.
+     * @param column The column to be used in the WHERE clause.
+     * @param value The value to be matched in the WHERE clause.
+     */
     public void addDeleteToTransaction(String tableName, String column, String value) {
         ArrayList<ArrayList<String>> tableBuffer = buffer.getOrDefault(tableName, new ArrayList<>());
         ArrayList<String> rowValues = new ArrayList<>();

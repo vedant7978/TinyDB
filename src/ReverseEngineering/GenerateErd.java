@@ -12,6 +12,12 @@ import static Utils.ERDUtils.*;
 
 public class GenerateErd {
 
+
+    /**
+     * Generates an Entity-Relationship Diagram (ERD) for the specified database.
+     *
+     * @param databaseName The name of the database for which to generate the ERD.
+     */
     public static void generateERD(String databaseName) {
         File databaseDir = new File("./databases/" + databaseName);
         if (!databaseDir.exists() || !databaseDir.isDirectory()) {

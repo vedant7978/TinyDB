@@ -4,11 +4,27 @@ import Utils.RegexPatterns;
 
 import java.util.regex.Matcher;
 
+
+/**
+ * Validates SQL queries related to database tables.
+ */
 public class DatabaseTableValidator {
+    /**
+     * Validates a DROP TABLE query.
+     *
+     * @param parts The parts of the SQL query.
+     * @return True if the query is valid, otherwise false.
+     */
     public static boolean validateDropTable(String[] parts) {
         return parts.length >= 3 && parts[0].equalsIgnoreCase("DROP") && parts[1].equalsIgnoreCase("TABLE");
     }
 
+    /**
+     * Checks if a CREATE TABLE query is valid.
+     *
+     * @param query The SQL CREATE TABLE query.
+     * @return True if the query is valid, otherwise false.
+     */
     public static boolean isValidCreateTableQuery(String query) {
         Matcher matcher = RegexPatterns.VALID_QUERY_PATTERN.matcher(query.trim());
 

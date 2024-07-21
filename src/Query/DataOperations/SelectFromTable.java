@@ -19,6 +19,11 @@ public class SelectFromTable {
 
     private static final TransactionManager transactionManager = new TransactionManagerImpl();
 
+    /**
+     * Selects records from the table based on the query.
+     *
+     * @param query the SELECT query string
+     */
     public static void select(String query) {
         if (!TableUtils.isDatabaseSelected()) {
             System.out.println(ANSI_RED + "No database selected." + ANSI_RESET);
@@ -116,20 +121,22 @@ public class SelectFromTable {
                 }
             }
 
-            // Print headers for buffer data
-            for (int index : columnIndices) {
-                System.out.print(headers[index].trim().split(" ")[0] + " (Buffer)\t");
-            }
-            System.out.println();
-
-            // Print buffer data
-            for (String line : bufferLines) {
-                String[] rowValues = line.split(",", -1);
-                recordFound = true;
+            // Print headers for buffer data only if a transaction is active
+            if (transactionManager.isTransactionActive() && !query.toLowerCase().contains("where")) {
                 for (int index : columnIndices) {
-                    System.out.print(rowValues[index].trim().replace("'", "") + "\t");
+                    System.out.print(headers[index].trim().split(" ")[0] + " (Buffer)\t");
                 }
                 System.out.println();
+
+                // Print buffer data
+                for (String line : bufferLines) {
+                    String[] rowValues = line.split(",", -1);
+                    recordFound = true;
+                    for (int index : columnIndices) {
+                        System.out.print(rowValues[index].trim().replace("'", "") + "\t");
+                    }
+                    System.out.println();
+                }
             }
 
             if (!recordFound) {
@@ -142,6 +149,14 @@ public class SelectFromTable {
         }
     }
 
+    /**
+     * Determines the indices of the requested columns in the table.
+     *
+     * @param columnsPart the columns part of the SELECT query
+     * @param headers the headers of the table
+     * @param tableName the name of the table
+     * @return an array of indices of the requested columns
+     */
     private static int[] getColumnIndices(String columnsPart, String[] headers, String tableName) {
         int[] columnIndices;
         if (columnsPart.equals("*")) {

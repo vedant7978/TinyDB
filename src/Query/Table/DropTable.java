@@ -12,7 +12,15 @@ import static Query.Table.DatabaseTableValidator.validateDropTable;
 import static Utils.ColorConstraint.*;
 import static Utils.DatabaseUtils.getTotalRecords;
 
+/**
+ * Handles the dropping of database tables.
+ */
 public class DropTable {
+    /**
+     * Drops a table based on the provided query.
+     *
+     * @param query The SQL DROP TABLE query.
+     */
     public static void drop(String query) {
         if (!TableUtils.isDatabaseSelected()) {
             System.out.println(ANSI_RED + "No database selected." + ANSI_RESET);
@@ -44,6 +52,13 @@ public class DropTable {
         }
     }
 
+    /**
+     * Logs the query and its state.
+     *
+     * @param query   The SQL query.
+     * @param message The message to log.
+     * @param success Indicates if the operation was successful.
+     */
     private static void logQueryAndState(String query, String message, boolean success) {
         long startTime = System.currentTimeMillis();
         String databaseName = getCurrentDatabase();

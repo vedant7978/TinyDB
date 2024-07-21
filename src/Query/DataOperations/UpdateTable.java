@@ -18,6 +18,11 @@ import static Utils.ColorConstraint.ANSI_RESET;
 public class UpdateTable {
     private static final TransactionManagerImpl transactionManager = new TransactionManagerImpl();
 
+    /**
+     * Updates records in the table based on the query.
+     *
+     * @param query the UPDATE query string
+     */
     public static void update(String query) {
         if (!TableUtils.isDatabaseSelected()) {
             System.out.println(ANSI_RED + "No database selected." + ANSI_RESET);
@@ -49,6 +54,15 @@ public class UpdateTable {
         }
     }
 
+    /**
+     * Executes the update operation on the specified table.
+     *
+     * @param tableName the name of the table
+     * @param updateColumn the column to update
+     * @param updateValue the value to set in the update column
+     * @param conditionColumn the column to match for the condition
+     * @param conditionValue the value to match for the condition
+     */
     public static void executeUpdate(String tableName, String updateColumn, String updateValue, String conditionColumn, String conditionValue) {
         File tableFile = TableUtils.getTableFile(tableName);
         if (tableFile == null) {

@@ -7,8 +7,18 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.*;
 
+
+/**
+ * Utility class for handling JSON file operations.
+ */
 public class JSONUtility {
 
+    /**
+     * Writes a new log entry to a JSON log file.
+     *
+     * @param logFilePath the path of the log file
+     * @param logEntry the log entry to write
+     */
     public static void writeLogEntry(String logFilePath, Map<String, Object> logEntry) {
         if (logFilePath == null || logFilePath.isEmpty()) {
             System.err.println("Log file path is null or empty.");
@@ -64,6 +74,12 @@ public class JSONUtility {
     }
 
 
+    /**
+     * Converts a JSON string to a map.
+     *
+     * @param json the JSON string
+     * @return the resulting map
+     */
     private static Map<String, Object> jsonToMap(String json) {
         Map<String, Object> map = new HashMap<>();
         json = json.substring(1, json.length() - 1).trim(); // Remove outer braces
@@ -81,6 +97,12 @@ public class JSONUtility {
         return map;
     }
 
+    /**
+     * Parses a string value into an appropriate type (e.g., Integer, Boolean).
+     *
+     * @param value the value string
+     * @return the parsed value
+     */
     private static Object parseValue(String value) {
         if (value.equals("null")) {
             return null;
@@ -103,6 +125,12 @@ public class JSONUtility {
         }
     }
 
+    /**
+     * Converts a map to a JSON string.
+     *
+     * @param map the map to convert
+     * @return the JSON string representation of the map
+     */
     public static String mapToJson(Map<String, Object> map) {
         StringBuilder json = new StringBuilder();
         json.append("{");

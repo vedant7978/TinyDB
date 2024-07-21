@@ -16,7 +16,15 @@
     import static Utils.ColorConstraint.*;
     import static Utils.DatabaseUtils.getTotalRecords;
 
+    /**
+     * Handles the creation of database tables.
+     */
     public class CreateTable {
+        /**
+         * Creates a table based on the provided query.
+         *
+         * @param query The SQL CREATE TABLE query.
+         */
         public static void create(String query) {
             if (!TableUtils.isDatabaseSelected()) {
                 System.out.println(ANSI_RED + "No database selected." + ANSI_RESET);
@@ -49,6 +57,12 @@
             }
         }
 
+        /**
+         * Creates a table with foreign key constraints.
+         *
+         * @param tableName        The name of the table to create.
+         * @param columnsDefinition The columns definition string.
+         */
         public static void createTableWithForeignKey(String tableName, String columnsDefinition) {
             File tableFile = new File("./databases/" + getCurrentDatabase() + "/" + tableName + ".txt");
 
@@ -63,6 +77,13 @@
             }
         }
 
+        /**
+         * Logs the query and its state.
+         *
+         * @param query   The SQL query.
+         * @param message The message to log.
+         * @param success Indicates if the operation was successful.
+         */
         private static void logQueryAndState(String query, String message, boolean success) {
             long startTime = System.currentTimeMillis();
             String databaseName = getCurrentDatabase();
