@@ -12,7 +12,6 @@ import static Utils.ERDUtils.*;
 
 public class GenerateErd {
 
-
     /**
      * Generates an Entity-Relationship Diagram (ERD) for the specified database.
      *

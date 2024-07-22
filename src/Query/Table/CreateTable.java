@@ -87,7 +87,11 @@
         private static void logQueryAndState(String query, String message, boolean success) {
             long startTime = System.currentTimeMillis();
             String databaseName = getCurrentDatabase();
+            if (databaseName == null) {
+                return;
+            }
             int numberOfTables = TableUtils.getNumberOfTables(databaseName);
+            System.out.println(databaseName);
             int totalRecords = getTotalRecords(new File("./databases/" + databaseName));
 
             GeneralLog.log(query, System.currentTimeMillis() - startTime, numberOfTables, totalRecords);

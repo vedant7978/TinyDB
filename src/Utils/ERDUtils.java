@@ -13,8 +13,18 @@ import java.util.regex.Pattern;
 
 import static Utils.ColorConstraint.*;
 
-public class ERDUtils {
 
+/**
+ * Utility class for handling ERD (Entity-Relationship Diagram) operations.
+ */
+public class ERDUtils {
+    /**
+     * Retrieves the details of the columns in a specified table of a given database.
+     *
+     * @param databaseName the name of the database
+     * @param tableName the name of the table
+     * @return a map of column names to their details
+     */
     public static Map<String, ColumnDetail> getColumnDetails(String databaseName, String tableName) {
         Map<String, ColumnDetail> columnDetails = new HashMap<>();
         File tableFile = new File("./databases/" + databaseName + "/" + tableName + ".txt");
@@ -50,12 +60,23 @@ public class ERDUtils {
 
         return columnDetails;
     }
+    /**
+     * Extracts the type of a column from its attributes.
+     *
+     * @param columnAttributes the column attributes string
+     * @return the column type
+     */
 
     private static String extractType(String columnAttributes) {
         int spaceIndex = columnAttributes.indexOf(' ');
         return spaceIndex > 0 ? columnAttributes.substring(0, spaceIndex).trim() : columnAttributes.trim();
     }
-
+    /**
+     * Extracts the constraints of a column from its attributes.
+     *
+     * @param columnAttributes the column attributes string
+     * @return the column constraints
+     */
     private static String extractConstraints(String columnAttributes) {
         int typeEndIndex = columnAttributes.indexOf(' ');
         if (typeEndIndex < 0) return null;
@@ -71,7 +92,12 @@ public class ERDUtils {
         }
         return constraintsPart.replaceAll(" +", " ").trim();
     }
-
+    /**
+     * Extracts the reference part of a column's attributes.
+     *
+     * @param columnAttributes the column attributes string
+     * @return the reference string
+     */
     private static String extractReference(String columnAttributes) {
         int refIndex = columnAttributes.indexOf("REFERENCES");
         if (refIndex >= 0) {
@@ -83,7 +109,12 @@ public class ERDUtils {
         }
         return null;
     }
-
+    /**
+     * Extracts the relation part of a column's attributes.
+     *
+     * @param columnAttributes the column attributes string
+     * @return the relation string
+     */
     private static String extractRelation(String columnAttributes) {
         int relIndex = columnAttributes.indexOf("RELATION");
         if (relIndex >= 0) {
@@ -96,7 +127,12 @@ public class ERDUtils {
         }
         return null;
     }
-
+    /**
+     * Retrieves the foreign keys from the column details.
+     *
+     * @param columns a map of column names to their details
+     * @return a list of foreign keys
+     */
     public static List<ForeignKey> getForeignKeys(Map<String, ColumnDetail> columns) {
         List<ForeignKey> fkList = new ArrayList<>();
         for (Map.Entry<String, ColumnDetail> entry : columns.entrySet()) {
@@ -114,7 +150,12 @@ public class ERDUtils {
         }
         return fkList;
     }
-
+    /**
+     * Creates a folder for storing ERD files.
+     *
+     * @param databaseName the name of the database
+     * @return the ERD folder file object
+     */
     public static File createErdFolder(String databaseName) {
         File erdMainFolder = new File("./ERD");
         if (!erdMainFolder.exists()) {
@@ -135,7 +176,14 @@ public class ERDUtils {
         }
         return erdFolder;
     }
-
+    /**
+     * Writes the ERD to a file.
+     *
+     * @param outputPath the output path for the ERD file
+     * @param databaseName the name of the database
+     * @param tableDetails a map of table names to their column details
+     * @param foreignKeys a map of table names to their foreign keys
+     */
     public static void writeErdToFile(String outputPath, String databaseName, Map<String, Map<String, ColumnDetail>> tableDetails, Map<String, List<ForeignKey>> foreignKeys) {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(outputPath))) {
             writer.write("ERD");
@@ -151,7 +199,13 @@ public class ERDUtils {
             System.out.println("Error writing ERD file: " + e.getMessage());
         }
     }
-
+    /**
+     * Writes the table details to the ERD file.
+     *
+     * @param writer the buffered writer
+     * @param tableDetails a map of table names to their column details
+     * @throws IOException if an I/O error occurs
+     */
     private static void writeTables(BufferedWriter writer, Map<String, Map<String, ColumnDetail>> tableDetails) throws IOException {
         writer.write("Tables:");
         writer.newLine();
@@ -168,7 +222,14 @@ public class ERDUtils {
             writer.newLine();
         }
     }
-
+    /**
+     * Writes the relationships (foreign keys) to the ERD file.
+     *
+     * @param writer the buffered writer
+     * @param tableDetails a map of table names to their column details
+     * @param foreignKeys a map of table names to their foreign keys
+     * @throws IOException if an I/O error occurs
+     */
     private static void writeRelationships(BufferedWriter writer, Map<String, Map<String, ColumnDetail>> tableDetails, Map<String, List<ForeignKey>> foreignKeys) throws IOException {
         writer.write("Relationships:");
         writer.newLine();
@@ -189,7 +250,12 @@ public class ERDUtils {
             }
         }
     }
-
+    /**
+     * Determines the cardinality of a relationship based on the column details.
+     *
+     * @param sourceDetail the column detail of the source column
+     * @return the cardinality string
+     */
     private static String determineCardinality(ColumnDetail sourceDetail) {
         if (sourceDetail.getConstraints() != null) {
             if (sourceDetail.getConstraints().contains("(PK)") || sourceDetail.getConstraints().contains("(U)")) {
