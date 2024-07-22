@@ -4,13 +4,16 @@ import Query.TransactionManagement.TransactionManager;
 import Query.TransactionManagement.TransactionManagerImpl;
 import Utils.RegexPatterns;
 import Utils.TableUtils;
+import Utils.DatabaseUtils;
 import Log.EventLog;
+import Log.GeneralLog;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import java.util.regex.Matcher;
 
+import static Query.Database.UseDatabase.getCurrentDatabase;
 import static Utils.ColorConstraint.*;
 
 public class DeleteFromTable {
@@ -63,6 +66,8 @@ public class DeleteFromTable {
      * @param value the value to match for deletion
      */
     public static void executeDelete(String tableName, String column, String value) {
+        long startTime = System.currentTimeMillis();
+
         File tableFile = TableUtils.getTableFile(tableName);
         if (tableFile == null) {
             System.out.println(ANSI_RED + "Table " + tableName + " does not exist." + ANSI_RESET);
@@ -92,6 +97,19 @@ public class DeleteFromTable {
             if (recordFound) {
                 System.out.println(ANSI_GREEN + "Record deleted successfully." + ANSI_RESET);
                 EventLog.logDatabaseChange("Record with " + column + " = " + value + " deleted successfully from table " + tableName);
+
+                // Get current database directory
+                File currentDatabaseDir = new File("./databases/" + getCurrentDatabase());
+
+                // Get the execution time
+                long executionTime = System.currentTimeMillis() - startTime;
+
+                // Count the number of table files and total records in the current database
+                int numberOfTables = DatabaseUtils.getAllTables(getCurrentDatabase()).size();
+                int totalRecords = DatabaseUtils.getTotalRecords(currentDatabaseDir);
+
+                // Log the general details
+                GeneralLog.log("Delete", executionTime, numberOfTables, totalRecords);
             } else {
                 System.out.println(ANSI_RED + "The specified data was not found in the table." + ANSI_RESET);
                 EventLog.logDatabaseChange("The specified data (" + column + " = " + value + ") was not found in table " + tableName);

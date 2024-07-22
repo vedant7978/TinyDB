@@ -1,7 +1,9 @@
 package Query.DataOperations;
 
+import Log.GeneralLog;
 import Query.TransactionManagement.TransactionManager;
 import Query.TransactionManagement.TransactionManagerImpl;
+import Utils.DatabaseUtils;
 import Utils.RegexPatterns;
 import Utils.TableUtils;
 import Log.EventLog;
@@ -12,6 +14,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.regex.Matcher;
 
+import static Query.Database.UseDatabase.getCurrentDatabase;
 import static Utils.ColorConstraint.*;
 
 public class InsertIntoTable {
@@ -59,6 +62,8 @@ public class InsertIntoTable {
      * @param values the values to insert into the table
      */
     public static void executeInsert(String tableName, String values) {
+        long startTime = System.currentTimeMillis();
+
         File tableFile = TableUtils.getTableFile(tableName);
         if (tableFile == null) {
             System.out.println(ANSI_RED + "Table " + tableName + " does not exist." + ANSI_RESET);
@@ -113,6 +118,18 @@ public class InsertIntoTable {
                 writer.write(System.lineSeparator() + formattedValues);
                 System.out.println(ANSI_GREEN + "Record inserted successfully into table " + tableName + "." + ANSI_RESET);
                 EventLog.logDatabaseChange("Record inserted successfully into table " + tableName + " with values: " + formattedValues);
+                // Get current database directory
+                File currentDatabaseDir = new File("./databases/" + getCurrentDatabase());
+
+                // Get the execution time
+                long executionTime = System.currentTimeMillis() - startTime;
+
+                // Count the number of table files and total records in the current database
+                int numberOfTables = DatabaseUtils.getAllTables(getCurrentDatabase()).size();
+                int totalRecords = DatabaseUtils.getTotalRecords(currentDatabaseDir);
+
+                // Log the general details
+                GeneralLog.log("Insert", executionTime, numberOfTables, totalRecords);
             }
         } catch (IOException e) {
             System.out.println(ANSI_RED + "Failed to insert record into table " + tableName + "." + ANSI_RESET);
